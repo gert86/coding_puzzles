@@ -8,6 +8,7 @@
 #include "stack.h"
 #include <QString>
 
+#include "gtest/gtest.h"
 
 using namespace std;
 
@@ -274,5 +275,26 @@ public:
 
 };
 
+
+TEST(LibBinaryTree, Test1)
+{
+    auto *left_sub = new BinaryTreeNode<string>("+");
+    left_sub->setLeft( new BinaryTreeNode<string>("3") );
+    left_sub->setRight( new BinaryTreeNode<string>("2") );
+
+    auto *right_sub = new BinaryTreeNode<string>("+");
+    right_sub->setLeft( new BinaryTreeNode<string>("4") );
+    right_sub->setRight( new BinaryTreeNode<string>("5") );
+
+    auto *root = new BinaryTreeNode<string>("*");
+    root->setLeft(left_sub);
+    root->setRight(right_sub);
+
+    BinaryTree<string> tree;
+    tree.setRoot(root);
+
+    Stack<string> parsed_values;
+    cout << "The post-order result is: " << tree.calculateResultPostOrder(parsed_values) << endl;
+}
 
 #endif // BINARYTREE_H

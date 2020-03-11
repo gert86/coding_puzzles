@@ -10,8 +10,11 @@
 #include <unordered_set>
 #include <random>
 #include <assert.h>
-
 #include <algorithm>
+
+#include "binarytree.h"
+
+#include "gtest/gtest.h"
 
 using namespace std;
 
@@ -61,10 +64,15 @@ int randomNumberNotFromList(int N, const vector<int> &l)
 
 int main(int argc, char *argv[])
 {    
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
 
+
+TEST(Daily_90, NormalCase)
+{
     vector<int> l = {1,2,3,1};
     int N = 10;
-
 
     vector<int> histogram;
     histogram.resize(N);
@@ -83,8 +91,8 @@ int main(int argc, char *argv[])
     for (int i=0; i<histogram.size(); i++)
     {
         cout << "The value " << i << " was returned " << histogram[i] << " times." << endl;
+        if (std::find(l.begin(), l.end(), i) != l.end())
+            ASSERT_EQ(0, histogram[i]);
     }
     cout << "----" << endl;
-
-    return 0;
 }

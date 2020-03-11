@@ -7,8 +7,13 @@ set(CMAKE_AUTOMOC ON)
 
 find_package(Qt5Core)
 
+# Locate GTest
+find_package(GTest REQUIRED)
+include_directories(${GTEST_INCLUDE_DIRS})
+
 # main source
-set(SOURCES "main.cpp")
+set(SOURCES "main.cpp" "testclass.cpp" "testclass.h")
+
 
 # lib sources
 set(LIBSOURCES ${LIBSOURCES} "../common/stack.h")
@@ -35,6 +40,7 @@ set(LIBSOURCES ${LIBSOURCES} "../common/graph.h")
 # lib
 add_library(mylib ${LIBSOURCES} )
 
+
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ../common)
-target_link_libraries(${PROJECT_NAME} Qt5::Core mylib)
+target_link_libraries(${PROJECT_NAME} Qt5::Core mylib ${GTEST_LIBRARIES} pthread)
