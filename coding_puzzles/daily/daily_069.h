@@ -29,9 +29,6 @@ public:
     //   --> If only negative numbers, use the three smallest ones
     // While iterating over whole array, store the 2 largest negative, the 3 largest positive, the 3 smallest negative and if there is a zero.
 
-
-
-
     int calcMaximumSumOfThree(const vector<int> &array)
     {
 

@@ -1,8 +1,6 @@
-#ifndef DOUBLYLINKEDLIST_H
-#define DOUBLYLINKEDLIST_H
+#pragma once
 
 #include <iostream>
-
 
 using namespace std;
 
@@ -207,5 +205,3 @@ public:
         cout << current_node->getData() << endl;
     }
 };
-
-#endif // DOUBLYLINKEDLIST_H

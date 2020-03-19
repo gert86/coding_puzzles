@@ -1,5 +1,4 @@
-#ifndef STACK_H
-#define STACK_H
+#pragma once
 
 #include <iostream>
 
@@ -93,5 +92,3 @@ public:
         return (m_top==nullptr);
     }
 };
-
-#endif // STACK_H

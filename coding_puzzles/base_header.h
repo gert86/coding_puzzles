@@ -18,6 +18,7 @@
 #include <random>
 #include <math.h>
 
+#include <QString>
 #include <QStringList>
 #include <QSet>
 #include <QPair>

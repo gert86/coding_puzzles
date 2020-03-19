@@ -1,5 +1,4 @@
-#ifndef QUEUE_H
-#define QUEUE_H
+#pragma once
 
 #include <iostream>
 
@@ -108,5 +107,3 @@ public:
     }
 
 };
-
-#endif // QUEUE_H

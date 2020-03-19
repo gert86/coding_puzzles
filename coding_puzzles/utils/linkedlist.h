@@ -1,5 +1,4 @@
-#ifndef LINKEDLIST_H
-#define LINKEDLIST_H
+#pragma once
 
 #include <iostream>
 
@@ -149,6 +148,3 @@ public:
         cout << this->toString() << endl;
     }
 };
-
-
-#endif // LINKEDLIST_H

@@ -1,9 +1,3 @@
-#include<QString>
-
-#include <algorithm>
-#include <vector>
-#include <numeric>
-
 // Cracking the Coding Interview Problems
 #include "cracking/cracking_001_001.h"
 #include "cracking/cracking_001_002.h"
@@ -53,8 +47,7 @@
 #include "other/interview_question_barraiser.h"
 #include "other/interview_question_phone.h"
 #include "other/util_tests.h"
-
-#include "other/template.h"
+#include "other/template.h"    // copy from this for new tests
 
 using namespace std;
 

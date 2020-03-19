@@ -9,7 +9,7 @@ using namespace Helper;
 
 // -------------------- Program starts here -------------------------
 //
-//You are in an infinite 2D grid where you can move in any of the 8 directions:
+// You are in an infinite 2D grid where you can move in any of the 8 directions:
 // (x,y) to
 //    (x+1, y),
 //    (x - 1, y),

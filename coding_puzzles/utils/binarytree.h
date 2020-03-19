@@ -1,18 +1,11 @@
-#ifndef BINARYTREE_H
-#define BINARYTREE_H
+#pragma once
 
 #include <iostream>
 #include <queue>
 
-// For daily 50
-#include "stack.h"
-#include <QString>
-
-#include "gtest/gtest.h"
-
 using namespace std;
 
-template <class T=int>    // default type does not work on all compilers!
+template <class T=int>    // note: omitting type and using default type does not work on all compilers!
 class BinaryTreeNode
 {
 private:
@@ -187,5 +180,3 @@ public:
         m_root->printLevelOrder();
     }
 };
-
-#endif // BINARYTREE_H

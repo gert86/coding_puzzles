@@ -1,5 +1,4 @@
-#ifndef GRAPH_H
-#define GRAPH_H
+#pragma once
 
 #include <iostream>
 #include <queue>
@@ -117,5 +116,3 @@ public:
         m_nodes = nodes;
     }
 };
-
-#endif // GRAPH_H

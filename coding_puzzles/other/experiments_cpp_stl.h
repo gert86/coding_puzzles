@@ -11,55 +11,55 @@ using namespace Helper;
 
 
 
-//Notes to STL:
-//-------------
+// Notes to STL:
+// -------------
 
-//Iteratoren sind container-spezifisch implementiert aber Zugriff ist einheitlich um Container besser austauschen zu können.
+// Iteratoren sind container-spezifisch implementiert aber Zugriff ist einheitlich um Container besser austauschen zu können.
 
-//Die wichtigsten Container:
-//--------------------------
-//std::vector			--> Array
-//std::list             --> Doubly-Linked List
-//std::forward_list     --> Singly Linked List
-//std::stack			--> Stack (LIFO)
-//std::queue			--> Queue (FIFO)
-//std::deque			--> Double sided queue
+// Die wichtigsten Container:
+// --------------------------
+// std::vector			--> Array
+// std::list            --> Doubly-Linked List
+// std::forward_list    --> Singly Linked List
+// std::stack			--> Stack (LIFO)
+// std::queue			--> Queue (FIFO)
+// std::deque			--> Double sided queue
 
-//WICHTIG: Es gibt KEINE Tree containers in STL oder boost! Dies ist nicht nötig, weil std::set und std::map Dinge intern ohnehin als binary tree abspeichern!
+// WICHTIG: Es gibt KEINE Tree containers in STL oder boost! Dies ist nicht nötig, weil std::set und std::map Dinge intern ohnehin als binary tree abspeichern!
 
-//std::set              --> Ordered, implemented as self-balanced tree, Search in logN, Insert/Delete in logN + Rebalance
-//std::unordered_set    --> No ordering, implemented as hashmap, Search/Insert/Delete in amortized O(1). Use only if no ordered traversal is needed.
-//std::map              --> same as set, but also stores a value to that key
-//std::unordered_map	--> same as unordered_set, but also stores a value to that key
-//Jede dieser 4 gibt es nochmal als ""multi-Variante", wenn man duplicates erlauben will: multiset, unordered_multiset, multimap, unordered_multimap
+// std::set              --> Ordered, implemented as self-balanced tree, Search in logN, Insert/Delete in logN + Rebalance
+// std::unordered_set    --> No ordering, implemented as hashmap, Search/Insert/Delete in amortized O(1). Use only if no ordered traversal is needed.
+// std::map              --> same as set, but also stores a value to that key
+// std::unordered_map	--> same as unordered_set, but also stores a value to that key
+// Jede dieser 4 gibt es nochmal als ""multi-Variante", wenn man duplicates erlauben will: multiset, unordered_multiset, multimap, unordered_multimap
 
-//Info: Es gibt auch sowas wie hash_map im std namespace, aber dies ist nicht Teil der STL sondern eine compiler-abhänige Extension (gcc vs msvc). Wenn man Hash Tables
-//benutzen will --> std::unordered_set oder std::unordered_map.
+// Info: Es gibt auch sowas wie hash_map im std namespace, aber dies ist nicht Teil der STL sondern eine compiler-abhänige Extension (gcc vs msvc). Wenn man Hash Tables
+// benutzen will --> std::unordered_set oder std::unordered_map.
 
-//std::priority_queue	--> Adaption von queue, wo das größte (=default) Element in konstanter Zeit accessed werden kann mit top(), dafür dauert Insertion/Deletion logN.
-//                          Iteriert man über priority_queue, so sind die Elemente stets geordnet.
-
-
+// std::priority_queue	--> Adaption von queue, wo das größte (=default) Element in konstanter Zeit accessed werden kann mit top(), dafür dauert Insertion/Deletion logN.
+//                           Iteriert man über priority_queue, so sind die Elemente stets geordnet.
 
 
-//Common member functions for most containers:
-//--------------------------------------------
-//push_front()    	// nicht für vector
-//pop_front()    	// nicht für vector
-//at()				// Mit bounding check -> Nur für vector und deque
-//[]				// Ohne bounding check -> Nur für vector und deque
-//push_back()
-//pop_back()
-//empty()
-//size()
-//insert()			// at a particular position
-//erase()			// at a particular position
-//remove()			// a particular value (only for lists). Takes O(N) because it needs to search first.
-//clear()			// remove all
-//resize()
-//front()			// access front element
-//back()			// access back element
-//top()             // Meist vorhanden, wenn nur von einer Seite accessed werden kann, statt front/back.
+
+
+// Common member functions for most containers:
+// --------------------------------------------
+// push_front()    	// nicht für vector
+// pop_front()    	// nicht für vector
+// at()				// Mit bounding check -> Nur für vector und deque
+// []				// Ohne bounding check -> Nur für vector und deque
+// push_back()
+// pop_back()
+// empty()
+// size()
+// insert()			// at a particular position
+// erase()			// at a particular position
+// remove()			// a particular value (only for lists). Takes O(N) because it needs to search first.
+// clear()			// remove all
+// resize()
+// front()			// access front element
+// back()			// access back element
+// top()            // Meist vorhanden, wenn nur von einer Seite accessed werden kann, statt front/back.
 
 
 
