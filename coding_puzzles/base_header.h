@@ -60,4 +60,17 @@ namespace Helper
         }
         return ss.str();
     }
+
+    template <typename T>
+    string printDeque(const deque<T> &elements)
+    {
+        stringstream ss;
+        for (auto it = elements.begin(); it != elements.end(); it++)
+        {
+            ss << *it;
+            ss << " ";
+
+        }
+        return ss.str();
+    }
 }

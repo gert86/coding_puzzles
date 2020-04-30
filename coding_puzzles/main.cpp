@@ -39,6 +39,8 @@
 #include "daily/daily_100.h"
 #include "daily/daily_118.h"
 #include "daily/daily_119.h"
+#include "daily/daily_123.h"
+#include "daily/daily_126.h"
 
 // Other
 #include "other/experiments_cpp_inheritance.h"
