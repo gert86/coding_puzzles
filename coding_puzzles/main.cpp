@@ -42,6 +42,18 @@
 #include "daily/daily_123.h"
 #include "daily/daily_126.h"
 
+// Euler
+#include "euler/euler_01.h"
+#include "euler/euler_02.h"
+#include "euler/euler_03.h"
+#include "euler/euler_04.h"
+#include "euler/euler_05.h"
+#include "euler/euler_06.h"
+#include "euler/euler_07.h"
+#include "euler/euler_08.h"
+#include "euler/euler_09.h"
+#include "euler/euler_10.h"
+
 // Other
 #include "other/experiments_cpp_inheritance.h"
 #include "other/experiments_cpp_stl.h"

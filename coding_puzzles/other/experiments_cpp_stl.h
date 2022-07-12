@@ -120,8 +120,8 @@ TEST(CLASSNAME, Part1)
 //    Useful functions (Part 2):
 //    --------------------------
 //    binary_search(first_iterator, last_iterator, x) 	// Tests whether x exists in sorted vector or not (only returns bool!)
-//    lower_bound(first_iterator, last_iterator, x) 	// returns iterator pointing to 1st element in [first,last) which has a value not less than ‘x’.
-//    upper_bound(first_iterator, last_iterator, x) 	// returns iterator pointing to 1st element in [first,last) which has a value greater than ‘x’.
+//    lower_bound(first_iterator, last_iterator, x) 	// returns iterator pointing to 1st element in [first,last) which has a value >= ‘x’.
+//    upper_bound(first_iterator, last_iterator, x) 	// returns iterator pointing to 1st element in [first,last) which has a value > ‘x’.
 //
 //    Note: They can be applied to ANY sorted sequence container, but it does not make sense for anything else then a vector
 TEST(CLASSNAME, Part2)
@@ -346,7 +346,7 @@ TEST(CLASSNAME, Part6)
     my_stack.push(3); my_stack.push(4); my_stack.push(5);   // Insert with push() at the top
     accessed_val = my_stack.top();     // only top() can be accessed, which is LATEST INSERTED element (LIFO)
     ASSERT_EQ(5, accessed_val);
-    my_stack.pop();                    // pop is a separate function doing REMOVAL ONLY from top!
+    my_stack.pop();                    // pop is a separate function doing REMOVAL ONLY from top!    
     // no find, no clear
 
 
@@ -407,7 +407,7 @@ TEST(CLASSNAME, Part6)
     my_forward_list.pop_front(); PPSL;                                     // pop is only for front  // 3, 5
     my_forward_list.clear();
     // no find, but broad API (reverse(), sort(), unique(), ...)
-    // where is the next pointer???
+    // the next pointer is not a member or function, can be retrieved with std::next()
 
 
     // list - "doubly linked list"
@@ -425,7 +425,7 @@ TEST(CLASSNAME, Part6)
     my_list.clear();
     // no find, but broad API (reverse(), sort(), unique(), ...)
     // different API than forward_list. No insert_after --> insert. No before_begin.
-    // where is the next and prev pointer???
+    // the next and prev pointers are no members or functions, can be retrieved with std::next() and std::prev()
 
     // ----------------------------------------------------------------------------------------
 

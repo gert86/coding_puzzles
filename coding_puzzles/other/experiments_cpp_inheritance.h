@@ -203,7 +203,7 @@ TEST(CLASSNAME, Test1)
 
 
     //Base *polymorph_priv = new DerivedPrivate();      // Base is an inaccessible base of DerivedPrivate
-    //Base *polymorph_prot = new DerivedProtected();    // Base is an inaccessible base of DerivedPrivate
+    //Base *polymorph_prot = new DerivedProtected();    // Base is an inaccessible base of DerivedProtected
     Base *polymorph_publ = new DerivedPublic();         // OK
 }
 

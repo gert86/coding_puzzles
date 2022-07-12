@@ -4,12 +4,14 @@
 
 #include "base_header.h"
 
+#include <unordered_map>
+
 using namespace std;
 using namespace Helper;
 
 // -------------------- Program starts here -------------------------
 //
-// Coins: Given an innnite number of quarters (25 cents), dimes (10 cents), nickels (5 cents), and
+// Coins: Given an infinite number of quarters (25 cents), dimes (10 cents), nickels (5 cents), and
 // pennies (1 cent), write code to calculate the number of ways of representing n cents.
 
 class CLASSNAME
@@ -20,7 +22,63 @@ public:
         cout << "Running " << VERSION_STRING(CLASSNAME) << "..." << endl;
     }
 
-    // TODO: Add memoization and do not count different ordering twice (1,5,1 and 1,1,5 should not count twice).
+
+    // -------------------------------------------------------------------------------------------------------------------
+    // The first two solutions are simpler but not correct, as they do count duplicates more than once (e.g. 1,5 vs. 5,1)
+    // It is important to clarify first if this is allowed or not
+    // -------------------------------------------------------------------------------------------------------------------
+
+    std::unordered_map<int, int> _memoMap;
+
+    // Make sure to clear _memoMap first!!!
+    // Top down
+    int numPossibilitiesTopDownWithDuplicates(int amount, const QVector<int> &coins)
+    {
+      // found one more way
+      if (amount == 0)
+        return 1;
+
+      // gone too far
+      if (amount < 0)
+        return 0;
+
+      // already know that
+      if (_memoMap.find(amount) != _memoMap.end())
+        return _memoMap[amount];
+
+      // lets find out recursively...
+      int result = 0;
+      for (const auto& coin : coins) {
+        result += numPossibilitiesTopDownWithDuplicates(amount-coin, coins);
+      }
+
+      _memoMap[amount] = result;
+      return result;
+    }
+
+    // Bottom up
+    int numPossibilitiesBottomUpWithDuplicates(int amount, const QVector<int> &coins)
+    {
+      if (amount == 0)
+        return 0;
+
+      vector<int> possibilities(amount+1, 0);
+      possibilities[0] = 1;
+
+      for (int i=1; i <= amount; i++) {
+        for(const auto& coin : coins) {
+          if (i - coin >= 0) {
+            possibilities[i] += possibilities[i - coin];
+          }
+        }
+      }
+
+      return possibilities[amount];
+    }
+
+
+
+
 
 
     int numPossibilities(int amount, const QVector<int> &coins, QSet< QPair<int,int> > &hash_set)
@@ -93,8 +151,8 @@ public:
 };
 
 TEST(CLASSNAME, Test1)
-{    
-    CLASSNAME instance;    
+{
+    CLASSNAME instance;
 
     QVector<int> coins = {25, 10, 5, 1};
     QVector<int> test_vector;       QVector<int> result_vector;
@@ -130,8 +188,20 @@ TEST(CLASSNAME, Test1)
         // Returns 0 for an amount of 0! This is a question of convention and needs clarification with interviewer.
         QSet< QPair<int,int> > hash_set;
         int num_possibilities_ours = instance.numPossibilities(amount, coins, hash_set);
-        cout << "My Solution: Num. possibilities for amount " << amount << " is " << num_possibilities_ours <<  endl << endl;
+        cout << "My Solution: Num. possibilities for amount " << amount << " is " << num_possibilities_ours <<  endl;
         ASSERT_EQ(result_vector[i], num_possibilities_ours);
+
+
+        // easier solution top down, but counts duplicates twice (e.g. 5+1 and 1+5 are counted as two possibilities to reach 6)
+        instance._memoMap.clear();
+        int num_possibilities_td = instance.numPossibilitiesTopDownWithDuplicates(amount, coins);
+        cout << "   Top down Solution with duplicates: Num. possibilities for amount " << amount << " is " << num_possibilities_td <<  endl;
+
+        // easier solution bottom up down, but counts duplicates twice (e.g. 5+1 and 1+5 are counted as two possibilities to reach 6)
+        instance._memoMap.clear();
+        int num_possibilities_bu = instance.numPossibilitiesBottomUpWithDuplicates(amount, coins);
+        cout << "   Bottom up Solution with duplicates: Num. possibilities for amount " << amount << " is " << num_possibilities_bu <<  endl << endl;
+        ASSERT_EQ(num_possibilities_td, num_possibilities_bu);
     }
 }
 

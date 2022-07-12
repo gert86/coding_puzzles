@@ -21,32 +21,28 @@ public:
         cout << "Running " << VERSION_STRING(CLASSNAME) << "..." << endl;
     }
 
-    uint recursiveMultiplyHelper(uint bigger, uint smaller)
-    {
-        if (smaller == 0)
-            return 0;
-
-        if (smaller == 1)
-            return bigger;
-
-        int s = smaller >> 1;   // smaller divided by 2
-        int halfProd = recursiveMultiplyHelper(bigger, s);
-
-        if (smaller%2 == 0)
-        {
-            return halfProd + halfProd;
-        }
-        else
-        {
-            return halfProd + halfProd + bigger;
-        }
-    }
 
     uint recursiveMultiply(uint factor1, uint factor2)
     {
-        uint smaller = (factor1 < factor2) ? factor1 : factor2;
-        uint bigger  = (factor1 < factor2) ? factor2 : factor1;
-        return recursiveMultiplyHelper(bigger, smaller);
+      uint result = 0;
+
+      // trivial
+      /*
+      for (uint i=0; i < factor2; i++) {
+        result += factor1;
+      }
+      */
+
+      // geil
+      for (int i=0; i < 32; i++) {
+        if (factor1 & (0x1 << i)) {
+          result += (factor2 << i);
+        }
+      }
+
+
+
+      return result;
     }
 };
 

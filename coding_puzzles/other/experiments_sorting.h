@@ -40,9 +40,8 @@ public:
             return;
         }
 
-        int temp = array[index1];
-        array[index1] = array[index2];
-        array[index2] = temp;
+        // this is better
+        std::swap(array[index1], array[index2]);
     }
 
     void bubbleSort(vector<int> &array)
