@@ -20,55 +20,60 @@ public:
         cout << "Running " << VERSION_STRING(CLASSNAME) << "..." << endl;
     }
 
+    // Option 1:
+    // if the list is small compared to N and/or l changes often, consider to retry until number not in l is drawn
 
-    int randomNumberNotFromList(int N, const vector<int> &l)
+    // Option 2:
+    // if the number of possible options is very sparse and/or l never changes, consider to draw from N-uniqElem(l)
+    // and have a mapping to the correct available number
+
+
+    // N=7
+    // l=1,2,6
+    //mapping[0] = 0
+    //mapping[1] = 3
+    //mapping[2] = 4
+    //mapping[3] = 5
+
+    void printMap(const std::map<int, int> &myMap)
     {
-        // Put all forbidden vals into a hash-set...
-        std::unordered_set<int> forbidden_values;
-        for (int i : l)
-            forbidden_values.insert(i);
+      for (const auto &[key,val] : myMap) {
+        std::cout << "map[" << key << "] = " << val << std::endl;
+      }
+    }
 
-        // ... OR ...
+    int randomNumberNotFromList(int N, std::vector<int> l)
+    {
+      // Optimization: The mapping needs to be calculated only once
+      std::map<int, int> mapping;
+      std::set<int> mySet(l.begin(), l.end());
+      int numInvalids = 0;
+      for (size_t i=0; i<N; i++) {
+        if (mySet.find(i) != mySet.end())
+          numInvalids++;
+        else
+          mapping[i-numInvalids] = i;
+      }
+      //printMap(mapping);
 
-        // ...make a unique vector (must be sorted first!)
-        // HOWEVER, THIS SHOULD NOT BE USED BECAUSE FIND OPERATION WOULD TAKE LINEAR TIME (AND NEEDS MANUAL IMPLEMENTATION)!
-        //std::vector<int> forbidden_values = l;
-        //std::sort(forbidden_values.begin(), forbidden_values.end());
-        //std::unique(forbidden_values.begin(), forbidden_values.end());
+      // get random value between 0 and N-l.sze()
+      static std::default_random_engine generator;
+      generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
+      static std::uniform_int_distribution<int> distribution(0,N-mySet.size()-1);
+      int randomVal = distribution(generator);
 
-
-        // Calc. how many numbers can be omitted in random number generation
-        int num_forbidden = forbidden_values.size();
-        int N_reduced = N - num_forbidden;
-
-        // Calculate random number
-        random_device generator;              // this one uses "real" randomness but is not supported on all platforms
-        std::uniform_int_distribution<int> distribution(0, N_reduced - 1);
-        int rand_num = distribution(generator);
-
-
-        // Map back the random number to its original range (excluding forbidden values)
-        int num_valid = -1;
-        for (int i=0; i<N; i++)
-        {
-            if (forbidden_values.find(i) == forbidden_values.end())
-                num_valid++;
-
-            if (num_valid == rand_num)
-                return i;
-        }
-
-        cerr << "This should not happen..." << endl;
-        return -1;
+      return mapping[randomVal];
     }
 };
 
 TEST(CLASSNAME, Test1)
-{    
+{
     CLASSNAME instance;
 
     vector<int> l = {1,2,3,1};
     int N = 10;
+
+
 
     vector<int> histogram;
     histogram.resize(N);
