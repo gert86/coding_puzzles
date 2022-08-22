@@ -4,6 +4,8 @@
 
 #include "base_header.h"
 
+#include <optional>
+
 using namespace std;
 using namespace Helper;
 
@@ -18,136 +20,270 @@ using namespace Helper;
 class CLASSNAME
 {
 public:
-    CLASSNAME()
+  CLASSNAME()
+  {
+    cout << "Running " << VERSION_STRING(CLASSNAME) << "..." << endl;
+  }
+
+  // modified and simplified copy from doublylinkedlist.h
+  class MyDoublyLinkedListNode
+  {
+  public:
+    int                     m_data;
+    MyDoublyLinkedListNode *m_next;
+    MyDoublyLinkedListNode *m_prev;
+
+    MyDoublyLinkedListNode(int val) : m_data(val), m_next(nullptr), m_prev(nullptr)
     {
-        cout << "Running " << VERSION_STRING(CLASSNAME) << "..." << endl;
+    }
+  };
+
+  // modified and simplified copy from doublylinkedlist.h
+  class MyDoublyLinkedList
+  {
+  public:
+    MyDoublyLinkedListNode *m_first;
+    MyDoublyLinkedListNode *m_last;
+
+    MyDoublyLinkedList() : m_first(nullptr), m_last(nullptr)
+    {
     }
 
-    template <class K, class V>
-    class LRUCache
+
+    void popLast()
     {
-    private:
-        int m_size;
-        std::unordered_map<K, V> m_hash_map;
-        std::list<K> m_last_used_keys;
+      MyDoublyLinkedListNode* node = m_last;
+      if (node != nullptr)
+      {
+        m_last = node->m_prev;
+        if (m_last)
+          m_last->m_next = nullptr;
+        else
+          m_first = nullptr; // list is now empty
 
-    public:
-        LRUCache(int size) : m_size(size) {}
+        delete node;
+      }
+    }
 
-        string set(K key, V value);
-        V* get(K key);
-    };
+    void pushFirst(MyDoublyLinkedListNode* node)
+    {
+      if (node == nullptr)
+        return;
+
+      node->m_prev = nullptr;
+      node->m_next = m_first;
+
+      if (m_first)
+        m_first->m_prev = node;
+      else
+        m_last = node;   // this is the only node
+
+      m_first = node;
+    }
+
+    void erase(MyDoublyLinkedListNode *node)
+    {
+      auto myPrev = node->m_prev;
+      auto myNext = node->m_next;
+
+      if (myPrev == nullptr)
+        m_first = myNext;
+      if (myNext == nullptr)
+        m_last = myPrev;
+
+      if (myPrev != nullptr)
+        myPrev->m_next = myNext;
+      if (myNext != nullptr)
+        myNext->m_prev = myPrev;
+    }
+  };
+
+  class LRUCache
+  {
+  private:
+    size_t _cacheSize;
+    std::unordered_map<int, std::pair<int, MyDoublyLinkedListNode*>> _map;
+    mutable MyDoublyLinkedList _lruList;
+
+  public:
+    LRUCache(size_t n) :
+      _cacheSize(n)
+    {}
+
+    bool isFull() const
+    {
+      return _map.size() == _cacheSize;
+    }
+
+    void removeLeastRecentlyUsed()
+    {
+      int leastUsedKey = _lruList.m_last->m_data;
+      _lruList.popLast();
+      _map.erase(leastUsedKey);
+    }
+
+    void setMostRecent(MyDoublyLinkedListNode* node, int key, bool nodeExisted) const
+    {
+      if (_lruList.m_first == node) {
+        return;  // already most recent
+      }
+
+      if (nodeExisted)
+        _lruList.erase(node);
+      _lruList.pushFirst(node);
+    }
+
+
+    void set(int key, int value)
+    {
+      if (isFull()) {
+        removeLeastRecentlyUsed();
+      }
+
+      bool nodeExisted;
+      MyDoublyLinkedListNode* node;
+      if (_map.find(key) != _map.end()) {
+        nodeExisted = true;
+        node = _map.at(key).second;
+      }
+      else {
+        nodeExisted = false;
+        node = new MyDoublyLinkedListNode(key);
+      }
+
+      setMostRecent(node, key, nodeExisted);
+      _map[key] = std::make_pair(value, node);
+    }
+
+    std::optional<int> get(int key) const
+    {
+      if (_map.find(key) == _map.end())
+        return nullopt;
+
+      MyDoublyLinkedListNode* node = _map.at(key).second;
+      setMostRecent(node, key, true);
+      return _map.at(key).first;
+    }
+
+    void printMap() const
+    {
+      std::cout << std::endl << "MAP: " << std::endl;
+      for (const auto &[key, val] : _map)
+        std::cout << " map[" << key << "] = " << val.first << std::endl;
+    }
+
+    void printList() const
+    {
+      std::cout << "LIST: " << std::endl;
+      auto *current_node = _lruList.m_first;
+      while (current_node != nullptr) {
+        std::cout << " " << current_node->m_data;
+        current_node = current_node->m_next;
+      }
+      std::cout << std::endl;
+    }
+  };
 };
 
-template <class K, class V>
-string CLASSNAME::LRUCache<K,V>::set(K key, V value)
-{
-    // This string to be returned is only for testing - otherwise method can be void.
-    string operation = "";
-
-    if (m_hash_map.size() < m_size)
-    {
-        // enough space, no deletion from hash map necessary
-        if (m_hash_map.find(key)==m_hash_map.end())
-        {
-            m_last_used_keys.push_back(key);     // add to back of list
-            m_hash_map[key] = value;             // ADD
-            cout << "SET(NOT_FULL_ADD): Added " << key << " with value " << value << endl;
-            operation = "NOT_FULL_ADD";
-        }
-        else
-        {
-            m_last_used_keys.remove(key);        // move to...                  TODO: This is not O(1)!
-            m_last_used_keys.push_back(key);     // ...end of queue
-            m_hash_map[key] = value;             // UPDATE
-            cout << "SET(NOT_FULL_UPDATE): Updated " << key << " with value " << value << endl;
-            operation = "NOT_FULL_UPDATE";
-        }
-    }
-    else
-    {
-        // cache already full
-        if (m_hash_map.find(key)==m_hash_map.end())
-        {
-            // key does not exist yet, we must therefore erase the least used element
-            K key_to_remove = m_last_used_keys.front();
-            m_last_used_keys.pop_front();               // remove from front of list
-            m_hash_map.erase(key_to_remove);            // REMOVE
-
-            m_last_used_keys.push_back(key);            // add to back of list
-            m_hash_map[key] = value;                    // ADD
-
-            cout << "SET(FULL_REMOVE_ADD): Added " << key << " with value " << value << " but deleted least recently used key " << key_to_remove << endl;
-            operation = "FULL_REMOVE_ADD";
-        }
-        else
-        {
-            m_last_used_keys.remove(key);        // move to...                  TODO: This is not O(1)!
-            m_last_used_keys.push_back(key);     // ...end of queue
-            m_hash_map[key] = value;             // UPDATE
-
-            cout << "SET(FULL_UPDATE): Updated " << key << " with value " << value << endl;
-            operation = "FULL_UPDATE";
-        }
-    }
-
-    assert(m_hash_map.size() == m_last_used_keys.size());
-    return operation;
-}
-
-template <class K, class V>
-V* CLASSNAME::LRUCache<K,V>::get(K key)
-{
-    if (m_hash_map.find(key)==m_hash_map.end())
-    {
-        cout << "GET(NOT_FOUND): Key " << key << " does not exist. Nullptr returned." << endl;
-        return nullptr;
-    }
-    else
-    {
-        V &val = m_hash_map[key];            // GET
-        m_last_used_keys.remove(key);        // move to...                  TODO: This is not O(1)!
-        m_last_used_keys.push_back(key);     // ...end of queue
-
-        cout << "GET(FOUND): Key " << key << " has value " << val << endl;
-        return &val;
-    }
-}
-
 TEST(CLASSNAME, Test1)
-{    
-    CLASSNAME instance;
+{
+  CLASSNAME instance;
 
-    CLASSNAME::LRUCache<string,int> my_cache(3);
+  CLASSNAME::LRUCache cache(3);
+  ASSERT_EQ(cache.get(1), nullopt);
 
-    ASSERT_EQ("NOT_FULL_ADD",    my_cache.set("Apple",    0));
-    ASSERT_EQ("NOT_FULL_UPDATE", my_cache.set("Apple",    1));
-    ASSERT_EQ("NOT_FULL_UPDATE", my_cache.set("Apple",    2));
-    ASSERT_EQ("NOT_FULL_ADD",    my_cache.set("Bee",     11));
-    ASSERT_EQ("NOT_FULL_ADD",    my_cache.set("Crayon", 101));
-
-    ASSERT_EQ(2,       *my_cache.get("Apple"));
-    ASSERT_EQ(11,      *my_cache.get("Bee"));
-    ASSERT_EQ(101,     *my_cache.get("Crayon"));
-    ASSERT_EQ(nullptr,  my_cache.get("Drum"));
-    ASSERT_EQ(nullptr,  my_cache.get("Echo"));
-    cout << "------------------------------------------------------" << endl;
+  cache.set(1, 100);
+  ASSERT_EQ(*cache.get(1), 100);
+  cache.printMap();
+  cache.printList();
 
 
-    ASSERT_EQ("FULL_UPDATE", my_cache.set("Apple",     3));
-    ASSERT_EQ("FULL_UPDATE", my_cache.set("Bee",      12));
-    ASSERT_EQ("FULL_UPDATE", my_cache.set("Crayon",  102));
-
-    ASSERT_EQ(3,       *my_cache.get("Apple"));
-    cout << "------------------------------------------------------" << endl;
+  cache.set(2, 200);
+  ASSERT_EQ(*cache.get(2), 200);
+  cache.printMap();
+  cache.printList();
 
 
-    ASSERT_EQ("FULL_REMOVE_ADD", my_cache.set("Drum",     1000));  // Bee falls out
-    ASSERT_EQ(1000,     *my_cache.get("Drum"));
-    ASSERT_EQ(3,        *my_cache.get("Apple"));
-    ASSERT_EQ(nullptr,   my_cache.get("Bee"));
-    ASSERT_EQ(102,      *my_cache.get("Crayon"));
-    cout << "------------------------------------------------------" << endl;
+  cache.set(2, 201);
+  ASSERT_EQ(*cache.get(2), 201);
+  cache.printMap();
+  cache.printList();
+
+
+  cache.set(3, 300);
+  ASSERT_EQ(*cache.get(3), 300);
+  cache.printMap();
+  cache.printList();
+
+
+  cache.set(4, 400);
+  ASSERT_EQ(*cache.get(4), 400);
+  cache.printMap();
+  cache.printList();
+
+  ASSERT_EQ(cache.get(1), nullopt);   // 1 was the least recently used and got dropped
+  cache.printMap();
+  cache.printList();
+
+  ASSERT_EQ(*cache.get(3), 300);
+  ASSERT_EQ(*cache.get(2), 201);
+  ASSERT_EQ(*cache.get(4), 400);
+  cache.printMap();
+  cache.printList();
+
+  cache.set(5, 500);
+  ASSERT_EQ(*cache.get(5), 500);
+  cache.printMap();
+  cache.printList();
+
+  ASSERT_EQ(cache.get(3), nullopt);   // 3 was the least recently used and got dropped
+  ASSERT_EQ(*cache.get(2), 201);
+  ASSERT_EQ(*cache.get(4), 400);
+  ASSERT_EQ(*cache.get(5), 500);
+
+}
+
+
+TEST(CLASSNAME, Test2)
+{
+  CLASSNAME instance;
+  CLASSNAME::LRUCache cache(3);
+
+  cache.set(1001,    0);
+  cache.set(1001,    1);
+  cache.set(1001,    2);
+  cache.set(1002,   11);
+  cache.set(1003,  101);
+
+  ASSERT_EQ(2,       *cache.get(1001));
+  ASSERT_EQ(11,      *cache.get(1002));
+  ASSERT_EQ(101,     *cache.get(1003));
+  ASSERT_EQ(nullopt,  cache.get(1004));
+  ASSERT_EQ(nullopt,  cache.get(1005));
+  cache.printMap();
+  cache.printList();
+  cout << "------------------------------------------------------" << endl;
+
+
+  cache.set(1001,     3);
+  cache.set(1002,      12);
+  cache.set(1003,  102);
+
+  ASSERT_EQ(3,       *cache.get(1001));
+  cache.printMap();
+  cache.printList();
+  cout << "------------------------------------------------------" << endl;
+
+
+  cache.set(1004,     1000);  // 1002 falls out
+
+  ASSERT_EQ(1000,     *cache.get(1004));
+  ASSERT_EQ(3,        *cache.get(1001));
+  ASSERT_EQ(nullopt,   cache.get(1002));
+  ASSERT_EQ(102,      *cache.get(1003));
+  cache.printMap();
+  cache.printList();
+  cout << "------------------------------------------------------" << endl;
 }
 
 #undef CLASSNAME
