@@ -16,8 +16,21 @@ using namespace Helper;
 //
 // Given the list of flights [('SFO', 'COM'), ('COM', 'YYZ')] and starting airport 'COM', you should return null.
 //
-// Given the list of flights [('A', 'B'), ('A', 'C'), ('B', 'C'), ('C', 'A')] and starting airport 'A', you should return the list ['A', 'B', 'C', 'A', 'C'] even though
+// Given the list of flights [('A', 'B'), ('A', 'C'), ('B', 'C'), ('C', 'A')] and starting airport 'A',
+// you should return the list ['A', 'B', 'C', 'A', 'C'] even though
 // ['A', 'C', 'A', 'B', 'C'] is also a valid itinerary. However, the first one is lexicographically smaller.
+
+
+// Strategy:
+// start at given airport A, with remaining airports R and itinerary I (until here)
+// if remaining flights are empty -> DONE: return I
+// put all pairs (A, x) in a container and sort them by x
+// for each pair in container:
+//   remove currPair   from R_copy
+//   append currPair.x to I_copy
+//   recursive search with given airport x and R_copy, I_copy
+
+
 
 class CLASSNAME
 {

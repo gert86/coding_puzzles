@@ -4,26 +4,27 @@
 
 using namespace std;
 
+template <class T>
 class DoublyLinkedListNode
 {
 private:
-    int                   m_data;
+    T                   m_data;
     DoublyLinkedListNode *m_next;
     DoublyLinkedListNode *m_prev;
 
 public:
-    DoublyLinkedListNode(int val) : m_data(val), m_next(nullptr), m_prev(nullptr)
+    DoublyLinkedListNode(T val) : m_data(val), m_next(nullptr), m_prev(nullptr)
     {
     }
 
     virtual ~DoublyLinkedListNode()  {}
 
-    int getData() const
+    T getData() const
     {
         return m_data;
     }
 
-    void setData(int val)
+    void setData(T val)
     {
         m_data = val;
     }
@@ -64,11 +65,12 @@ public:
 
 };
 
+template <class T>
 class DoublyLinkedList
 {
 private:
-    DoublyLinkedListNode *m_first;
-    DoublyLinkedListNode *m_last;
+    DoublyLinkedListNode<T> *m_first;
+    DoublyLinkedListNode<T> *m_last;
 
 public:
     DoublyLinkedList() : m_first(nullptr), m_last(nullptr)
@@ -77,13 +79,13 @@ public:
 
     virtual ~DoublyLinkedList()  {}
 
-    DoublyLinkedListNode* getFirst() const
+    DoublyLinkedListNode<T>* getFirst() const
     {
         return m_first;
     }
 
     // only for doubly-linked list
-    DoublyLinkedListNode* getLast() const
+    DoublyLinkedListNode<T>* getLast() const
     {
         return m_last;
     }
@@ -91,7 +93,7 @@ public:
 
     void removeFirst()
     {        
-        DoublyLinkedListNode* node = m_first;
+        DoublyLinkedListNode<T>* node = m_first;
         if (node != nullptr)
         {
             m_first = node->getNext();
@@ -107,7 +109,7 @@ public:
     // only for doubly-linked list
     void removeLast()
     {
-        DoublyLinkedListNode* node = m_last;
+        DoublyLinkedListNode<T>* node = m_last;
         if (node != nullptr)
         {
             m_last = node->getPrev();
@@ -120,9 +122,9 @@ public:
         }
     }
 
-    void pushLast(int val)
+    void pushLast(T val)
     {
-        auto *node = new DoublyLinkedListNode(val);
+        auto *node = new DoublyLinkedListNode<T>(val);
         node->setPrev(m_last);
         if (m_last)
             m_last->setNext(node);
@@ -133,9 +135,9 @@ public:
     }
 
 
-    void pushFirst(int val)
+    void pushFirst(T val)
     {
-        auto *node = new DoublyLinkedListNode(val);
+        auto *node = new DoublyLinkedListNode<T>(val);
         node->setNext(m_first);
         if (m_first)
             m_first->setPrev(node);
@@ -148,7 +150,7 @@ public:
 
 
     // In contrast to singly-linked list, we must update m_last now
-    void pushNext(int val, DoublyLinkedListNode *predecessor)
+    void pushNext(T val, DoublyLinkedListNode<T> *predecessor)
     {
         if (predecessor==nullptr)
         {
@@ -156,7 +158,7 @@ public:
             exit(-1);
         }
 
-        auto *node = new DoublyLinkedListNode(val);
+        auto *node = new DoublyLinkedListNode<T>(val);
         node->setNext(predecessor->getNext());   // adopt successor from predecessor
         if (node->hasNext())
             node->getNext()->setPrev(node);      // successor (if exists) points back to this node
@@ -169,7 +171,7 @@ public:
     }
 
     // only for doubly-linked list
-    void pushPrev(int val, DoublyLinkedListNode *successor)
+    void pushPrev(T val, DoublyLinkedListNode<T> *successor)
     {
         if (successor==nullptr)
         {
@@ -177,7 +179,7 @@ public:
             exit(-1);
         }
 
-        auto *node = new DoublyLinkedListNode(val);
+        auto *node = new DoublyLinkedListNode<T>(val);
         node->setPrev(successor->getPrev());   // adopt predecessor from successor
         if (node->hasPrev())
             node->getPrev()->setNext(node);    // predecessor (if exists) points back to this node

@@ -35,8 +35,8 @@ public:
     bool isConvertibleToNumberRegex(const std::string &str)
     {
         // Inspired from: https://stackoverflow.com/questions/4654636/how-to-determine-if-a-string-is-a-number-with-c
-        return std::regex_match( str, std::regex( ( "((\\+|-)?[[:digit:]]+)(\\.(([[:digit:]]+)?))?" ) ) ) ||
-               std::regex_match( str, std::regex( ( "((\\+|-)?[[:digit:]]+)(e(\\+|-)?(([[:digit:]]+)?))?" ) ) );
+        return std::regex_match( str, std::regex("((\\+|-)?[[:digit:]]+)(\\.(([[:digit:]]+)?))?")     ) ||
+               std::regex_match( str, std::regex("((\\+|-)?[[:digit:]]+)(e(\\+|-)?(([[:digit:]]+)?))?") );
     }
 };
 

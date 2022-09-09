@@ -17,6 +17,36 @@ using namespace Helper;
 //
 // Each operation should run in O(1) time.
 
+
+// Strategy:
+// 34, -50, 42, 14, -5, 86
+// 34:        -> 34 -> store as max. series: [0,0]
+//-50: 34-50  -> <0 forget
+//       -50  -> <0 do not consider as new start
+// 42:        -> 42 best so far -> store as max. series: [2,2]
+// 14:        -> 42+14=56 even better -> store as max. series: [2,3]
+// -5:        -> 42+14-5=51 -> not max, but still > 0 so continue with this series
+// 86:        -> 42+14-5+86 -> 137 new max
+// use an unordered_map as cache -> access in O(1)
+// Keep the "least used" info in a (modified) linked list -> push/pop at both ends in O(1), erase in O(1) if node is known!
+// We need to store the Node* inside the cache, so that we never need to search the linked list
+//
+//
+// get(): queries the unordered_map
+//  if not exists -> return null
+//  if exists -> get the node from cache, remove node from list, re-add it to front of list (most recently used)
+//  return element
+//
+// set(): queries the unordered map
+//   if not exists -> create a new list node, add it to front of list (most recently used)
+//   if exists     -> get the node from cache, remove node from list, re-add it to front of list (most recently used)
+//
+//   if (cache is full and not exists)
+//     remove list node from back of list (least recently used)
+//     remove element from cache
+//   store element to cache
+
+
 class CLASSNAME
 {
 public:
@@ -165,16 +195,16 @@ public:
       return _map.at(key).first;
     }
 
-    void printMap() const
+    void printCacheMap() const
     {
-      std::cout << std::endl << "MAP: " << std::endl;
+      std::cout << std::endl << "Cache: " << std::endl;
       for (const auto &[key, val] : _map)
         std::cout << " map[" << key << "] = " << val.first << std::endl;
     }
 
-    void printList() const
+    void printLruList() const
     {
-      std::cout << "LIST: " << std::endl;
+      std::cout << "LRU List: " << std::endl;
       auto *current_node = _lruList.m_first;
       while (current_node != nullptr) {
         std::cout << " " << current_node->m_data;
@@ -194,47 +224,47 @@ TEST(CLASSNAME, Test1)
 
   cache.set(1, 100);
   ASSERT_EQ(*cache.get(1), 100);
-  cache.printMap();
-  cache.printList();
+  cache.printCacheMap();
+  cache.printLruList();
 
 
   cache.set(2, 200);
   ASSERT_EQ(*cache.get(2), 200);
-  cache.printMap();
-  cache.printList();
+  cache.printCacheMap();
+  cache.printLruList();
 
 
   cache.set(2, 201);
   ASSERT_EQ(*cache.get(2), 201);
-  cache.printMap();
-  cache.printList();
+  cache.printCacheMap();
+  cache.printLruList();
 
 
   cache.set(3, 300);
   ASSERT_EQ(*cache.get(3), 300);
-  cache.printMap();
-  cache.printList();
+  cache.printCacheMap();
+  cache.printLruList();
 
 
   cache.set(4, 400);
   ASSERT_EQ(*cache.get(4), 400);
-  cache.printMap();
-  cache.printList();
+  cache.printCacheMap();
+  cache.printLruList();
 
   ASSERT_EQ(cache.get(1), nullopt);   // 1 was the least recently used and got dropped
-  cache.printMap();
-  cache.printList();
+  cache.printCacheMap();
+  cache.printLruList();
 
   ASSERT_EQ(*cache.get(3), 300);
   ASSERT_EQ(*cache.get(2), 201);
   ASSERT_EQ(*cache.get(4), 400);
-  cache.printMap();
-  cache.printList();
+  cache.printCacheMap();
+  cache.printLruList();
 
   cache.set(5, 500);
   ASSERT_EQ(*cache.get(5), 500);
-  cache.printMap();
-  cache.printList();
+  cache.printCacheMap();
+  cache.printLruList();
 
   ASSERT_EQ(cache.get(3), nullopt);   // 3 was the least recently used and got dropped
   ASSERT_EQ(*cache.get(2), 201);
@@ -260,8 +290,8 @@ TEST(CLASSNAME, Test2)
   ASSERT_EQ(101,     *cache.get(1003));
   ASSERT_EQ(nullopt,  cache.get(1004));
   ASSERT_EQ(nullopt,  cache.get(1005));
-  cache.printMap();
-  cache.printList();
+  cache.printCacheMap();
+  cache.printLruList();
   cout << "------------------------------------------------------" << endl;
 
 
@@ -270,8 +300,8 @@ TEST(CLASSNAME, Test2)
   cache.set(1003,  102);
 
   ASSERT_EQ(3,       *cache.get(1001));
-  cache.printMap();
-  cache.printList();
+  cache.printCacheMap();
+  cache.printLruList();
   cout << "------------------------------------------------------" << endl;
 
 
@@ -281,8 +311,8 @@ TEST(CLASSNAME, Test2)
   ASSERT_EQ(3,        *cache.get(1001));
   ASSERT_EQ(nullopt,   cache.get(1002));
   ASSERT_EQ(102,      *cache.get(1003));
-  cache.printMap();
-  cache.printList();
+  cache.printCacheMap();
+  cache.printLruList();
   cout << "------------------------------------------------------" << endl;
 }
 

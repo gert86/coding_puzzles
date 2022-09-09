@@ -13,10 +13,12 @@
 #include <list>
 #include <stack>
 #include <numeric>
+#include <queue>
 #include <unordered_set>
 #include <unordered_map>
 #include <random>
 #include <math.h>
+#include <chrono>
 
 #include <QString>
 #include <QStringList>
@@ -72,5 +74,24 @@ namespace Helper
 
         }
         return ss.str();
+    }
+
+    template <typename T>
+    string printQueue(std::queue<T> elements)
+    {
+        stringstream ss;
+        while (!elements.empty()) {
+            ss << elements.front() << " ";
+            elements.pop();
+        }
+        return ss.str();
+    }
+
+    template <typename K, typename V>
+    void printMap(const std::map<K, V> &myMap)
+    {
+      for (const auto &[key,val] : myMap) {
+        std::cout << "map[" << key << "] = " << val << std::endl;
+      }
     }
 }

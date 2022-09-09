@@ -66,8 +66,8 @@ public:
 
       // NOTE: Algorithm can be improved from O(N*M) to O(N) if we do not recalculate the entire product over all numDigits (= "M") at every step.
       //       If there were no zeros, it would be straight forward (newProduct = oldPruduct * newLastValue / prevFirstValue).
-      size_t lowerIndex = 1;
-      size_t upperIndex = numDigits;
+      size_t lowerIndex = 0;
+      size_t upperIndex = numDigits-1;
       while (upperIndex < numberString.size()) {
         currProduct = 1;
         for (int i=lowerIndex; i <= upperIndex; i++) {

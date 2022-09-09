@@ -4,6 +4,9 @@
 
 #include "base_header.h"
 
+#include "utils/linkedlist.h"
+
+
 using namespace std;
 using namespace Helper;
 
@@ -11,7 +14,24 @@ using namespace Helper;
 //
 // Given the head of a singly linked list, reverse it in-place.
 
-#include "utils/linkedlist.h"
+
+// Example:
+// 0 -> next=1    (head)
+// 1 -> next=2
+// 2 -> next=3
+// 3 -> next=nullptr
+//
+// 0 -> next = nullptr
+// 1 -> next = 0
+// 2 -> next = 1
+// 3 -> next = 2   (new head -> needs to be set in Linked list)
+
+// Strategy:
+// while(currNode != nullptr)
+//  auto nextNode = currNode->getNext();  // can be nullptr
+//  currNode->setNext(prevNode);          // prevNode initially nullptr
+//  prevNode = currNode
+//  currNode = nextNode
 
 class CLASSNAME
 {
@@ -21,19 +41,20 @@ public:
         cout << "Running " << VERSION_STRING(CLASSNAME) << "..." << endl;
     }
 
-    void reverseLinkedList(LinkedList &list)
+    template <class T>
+    void reverseLinkedList(LinkedList<T> &list)
     {
-        LinkedListNode *prev_node = nullptr;
-        LinkedListNode *node = list.getFirst();
-        while(node != nullptr)
-        {
-            LinkedListNode *original_next = node->getNext();
-            node->setNext(prev_node);
+      auto currNode = list.getFirst();
+      LinkedListNode<T>* prevNode = nullptr;
 
-            prev_node = node;
-            node = original_next;
-        }
-        list.m_first = prev_node;   // is private, but declared as friend
+      while(currNode != nullptr) {
+        auto nextNode = currNode->getNext();
+        currNode->setNext(prevNode);
+
+        prevNode = currNode;
+        currNode = nextNode;
+      }
+      list.m_first = prevNode;
     }
 };
 
@@ -42,7 +63,7 @@ TEST(CLASSNAME, Test1)
     CLASSNAME instance;
 
     // Create a linked list (and test its implementation)
-    LinkedList list;
+    LinkedList<int> list;
     list.pushFirst(3);
     list.pushFirst(1);
     list.pushLast(4);

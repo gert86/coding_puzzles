@@ -24,6 +24,9 @@ using namespace Helper;
 
 TEST(CLASSNAME, BinaryTree)
 {        
+    //            8
+    //       4        10
+    //     2   6          20
     cout << "----- BINARY TREE -----" << endl;
     auto *left_sub = new BinaryTreeNode<int>(4);
     left_sub->setLeft( new BinaryTreeNode<int>(2) );
@@ -40,17 +43,17 @@ TEST(CLASSNAME, BinaryTree)
     cout << "The in-order traversal of an empty tree is: "; tree.printTreeInOrder(); cout << endl;
 
     tree.setRoot(root);
-    cout << "The in-order traversal is: "; tree.printTreeInOrder(); cout << endl;
-    cout << "The pre-order traversal is: "; tree.printTreePreOrder(); cout << endl;
-    cout << "The post-order traversal is: "; tree.printTreePostOrder(); cout << endl;
-    cout << "The level-order traversal is: "; tree.printTreeLevelOrder(); cout << endl;
+    cout << "The in-order traversal is: "; tree.printTreeInOrder(); cout << endl;        // 2 4 6 8 10 20
+    cout << "The pre-order traversal is: "; tree.printTreePreOrder(); cout << endl;      // 8 4 2 6 10 20
+    cout << "The post-order traversal is: "; tree.printTreePostOrder(); cout << endl;    // 2 6 4 20 10 8
+    cout << "The level-order traversal is: "; tree.printTreeLevelOrder(); cout << endl;  // 8 4 10 2 6 20
 }
 
 
 TEST(CLASSNAME, DoubleLinkedList)
 {
     cout << "----- DOUBLY-LINKED LIST -----" << endl;
-    DoublyLinkedList doubly_list;
+    DoublyLinkedList<long> doubly_list;
     doubly_list.printList();    // <EMPTY>
 
     doubly_list.pushFirst(3);
@@ -128,15 +131,15 @@ TEST(CLASSNAME, Graph)
 
 
     // currently either the one or the other can be caled, because visited is stored within GraphNode
-    //cout << "The depth-first search gives: ";   graph.getNodes().at(0)->printDepthFirstSearch(); cout << endl;
-    cout << "The breadth-first search gives: "; graph.getNodes().at(0)->printBreadthFirstSearch(); cout << endl;
+    cout << "The depth-first search gives: ";   graph.getNodes().at(0)->printDepthFirstSearch(); cout << endl;  // 0 1 3 2 4 5
+    //cout << "The breadth-first search gives: "; graph.getNodes().at(0)->printBreadthFirstSearch(); cout << endl;  // 0 1 4 5 3 2
 }
 
 
 TEST(CLASSNAME, SinglyLinkedList)
 {
     cout << "----- SINGLY-LINKED LIST -----" << endl;
-    LinkedList list;
+    LinkedList<int> list;
     list.printList();    // <EMPTY>
 
     list.pushFirst(3);
@@ -162,9 +165,9 @@ TEST(CLASSNAME, SinglyLinkedList)
 TEST(CLASSNAME, Queue)
 {
     cout << "----- QUEUE -----" << endl;
-    Queue queue;
+    Queue<std::string> queue;
     for (int i=0; i<10; i++)
-        queue.push(i);
+        queue.push(std::to_string(i));
 
     while(!queue.isEmpty())
     {

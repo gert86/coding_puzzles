@@ -4,35 +4,36 @@
 
 using namespace std;
 
+template <class T>
 class LinkedListNode
 {
 private:
-    int             m_data;
-    LinkedListNode *m_next;
+    T                 m_data;
+    LinkedListNode<T> *m_next;  // <T> is optional within the class
 
 public:
-    LinkedListNode(int val) : m_data(val), m_next(nullptr)
+    LinkedListNode<T>(T val) : m_data(val), m_next(nullptr)  // <T> is optional within the class
     {
     }
 
-    virtual ~LinkedListNode()  {}
+    virtual ~LinkedListNode<T>()  {}  // <T> is optional within the class
 
-    int getData() const
+    T getData() const
     {
         return m_data;
     }
 
-    void setData(int val)
+    void setData(T val)
     {
         m_data = val;
     }
 
-    LinkedListNode* getNext() const
+    LinkedListNode<T>* getNext() const  // <T> is optional within the class
     {
         return m_next;
     }
 
-    void setNext(LinkedListNode *next)
+    void setNext(LinkedListNode<T> *next)  // <T> is optional within the class
     {
         m_next = next;
     }
@@ -42,9 +43,9 @@ public:
         return (m_next!=nullptr);
     }
 
-    virtual void appendLast(int val)
+    virtual void appendLast(T val)
     {
-        auto *node = new LinkedListNode(val);
+        auto *node = new LinkedListNode<T>(val);  // <T> is optional within the class
 
         // find last node (without successor)
         auto *current = this;
@@ -55,22 +56,22 @@ public:
         current->setNext(node);   // append to last node        
     }
 
-    virtual void appendNext(int val)
+    virtual void appendNext(T val)
     {
-        auto *node = new LinkedListNode(val);
+        auto *node = new LinkedListNode<T>(val);  // <T> is optional within the class
 
         node->setNext(this->getNext());  // adopt successor from this
         this->setNext(node);             // append to this        
     }
 };
 
-
+template<class T>
 class LinkedList
 {
     friend class Daily_073;
 
 private:
-    LinkedListNode *m_first;
+    LinkedListNode<T> *m_first;
 
 public:   
 
@@ -80,14 +81,14 @@ public:
 
     virtual ~LinkedList()  {}
 
-    LinkedListNode* getFirst() const
+    LinkedListNode<T>* getFirst() const
     {
         return m_first;
     }
 
     virtual void removeFirst()
     {
-        LinkedListNode* node = m_first;
+        LinkedListNode<T>* node = m_first;
         if (node != nullptr)
         {
             m_first = node->getNext();
@@ -95,12 +96,12 @@ public:
         }
     }
 
-    void pushLast(int val)
+    void pushLast(T val)
     {
         if (m_first==nullptr)
         {
             // Insert manually since m_first is not yet initialized
-            m_first = new LinkedListNode(val);
+            m_first = new LinkedListNode<T>(val);
         }
         else
         {
@@ -108,14 +109,14 @@ public:
         }
     }
 
-    virtual void pushFirst(int val)
+    virtual void pushFirst(T val)
     {
-        auto *node = new LinkedListNode(val);
+        auto *node = new LinkedListNode<T>(val);
         node->setNext(m_first);
         m_first = node;
     }
 
-    void pushNext(int val, LinkedListNode *predecessor)
+    void pushNext(T val, LinkedListNode<T> *predecessor)
     {
         if (predecessor==nullptr)
         {

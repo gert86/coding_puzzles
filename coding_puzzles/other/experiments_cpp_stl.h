@@ -214,6 +214,9 @@ TEST(CLASSNAME, Part3)
     cout << endl << "Distance between first to max element: " << endl;
     cout << std::distance(vect2.begin(),
                           max_element(vect2.begin(), vect2.end()));   // Returns 7
+
+    cout << endl << "Distance calculated arithmetically: " << endl;
+    cout << static_cast<size_t>(max_element(vect2.begin(), vect2.end())  -  vect2.begin());  // should be the same
 }
 
 

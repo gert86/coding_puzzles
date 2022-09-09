@@ -21,6 +21,9 @@ public:
         cout << "Running " << VERSION_STRING(CLASSNAME) << "..." << endl;
     }
 
+    // 123 =         3    +          2    +           1
+    //     =         3    +       (23/10) +       (123/100)
+    //     = (123%10)/1    + (123%100)/10  + (123%1000)/100
     int getDigitSum(long num)
     {
         int sum = 0;

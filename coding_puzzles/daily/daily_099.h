@@ -13,9 +13,16 @@ using namespace Helper;
 // For example, given [100, 4, 200, 1, 3, 2], the longest consecutive element sequence is [1, 2, 3, 4]. Return its length: 4.
 // Your algorithm should run in O(n) complexity.
 
+
+// Strategy:
+// Iterate over each value and insert into hash map with value 1 if not yet exists (or continue if exists).
+// If it has no predecessor, the value 1 is already correct (new sequence)
+// If there is a predecessor, then set value to the predecessors value + 1 (sequence was extended by 1)
+// Then find existing successors and set their value to (val+1), (val+2), ...
+
 bool compare(const pair<int, int>&a, const pair<int, int>&b)
 {
-   return a.second<b.second;
+   return a.second < b.second;
 }
 
 
@@ -27,36 +34,27 @@ public:
         cout << "Running " << VERSION_STRING(CLASSNAME) << "..." << endl;
     }
 
-    // Strategy:
-    // Iterate over each value and insert into hash map with value 1 if not yet exists (if exists, then continue).
-    // After inserting increase the value by 1 for each existing predecessor
-    // Then find existing successors and set their value to (val+1), (val+2), ...
-
     int getLongestConsecutiveSequence(const vector<int> &array)
     {
         if (array.size() == 0)
             return 0;
 
         unordered_map<int, int> hash_map;
-        for (int key : array)
-        {
-            if (hash_map.find(key) != hash_map.end())
-            {
+        for (int key : array) {
+            if (hash_map.find(key) != hash_map.end()) {
                 continue;
             }
-            else
-            {
+            else {
                 hash_map[key] = 1;
 
-                // iterate over all direct predecessors and increment current value by 1 for each found
-                int curr_predecessor_key = key - 1;
-                while(hash_map.find(curr_predecessor_key) != hash_map.end())
-                {
-                    hash_map[key]++;
-                    curr_predecessor_key--;
+                // if this value has a predecessor, then the current value extended this sequence by 1
+                // otherwise its a new sequence that starts here
+                if(hash_map.find(key-1) != hash_map.end()) {
+                  hash_map[key] = hash_map[key-1] + 1;
                 }
 
-                // iterate over all direct successors and increment set their value to val + i
+
+                // iterate over all direct successors and increment their value to val + i
                 int curr_successor_key = key + 1;
                 int index_diff = 1;
                 while(hash_map.find(curr_successor_key) != hash_map.end())
@@ -69,18 +67,6 @@ public:
         }
 
         // return max. value from hash map
-//        int current_max = std::numeric_limits<int>::min();
-//        for (auto &it : hash_map)
-//        {
-//            //cout << "#### First: " << it.first << " --> Second: " << it.second << endl;
-//            if (it.second > current_max)
-//            {
-//                current_max = it.second;
-//            }
-//        }
-//        return current_max;
-
-        // nicer way to do this
         return max_element(hash_map.begin(), hash_map.end(), compare)->second;
     }
 

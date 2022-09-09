@@ -12,34 +12,29 @@ using namespace Helper;
 // Given an integer n and a list of integers l, write a function that randomly generates
 // a number from 0 to n-1 that isn't in l (uniform).
 
+
+// Option 1:
+// if the list is small compared to N and/or l changes often, consider to retry until number not in l is drawn
+
+// Option 2:
+// if the number of possible options is very sparse and/or l never changes, consider to draw from N-uniqElem(l)
+// and have a mapping to the correct available number
+//
+// N=7
+// l=1,2,6
+// 4 numbers left, we draw a number from [0-3] and map it to 0, 3, 4, 5
+//mapping[0] = 0
+//mapping[1] = 3
+//mapping[2] = 4
+//mapping[3] = 5
+
+
 class CLASSNAME
 {
 public:
     CLASSNAME()
     {
         cout << "Running " << VERSION_STRING(CLASSNAME) << "..." << endl;
-    }
-
-    // Option 1:
-    // if the list is small compared to N and/or l changes often, consider to retry until number not in l is drawn
-
-    // Option 2:
-    // if the number of possible options is very sparse and/or l never changes, consider to draw from N-uniqElem(l)
-    // and have a mapping to the correct available number
-
-
-    // N=7
-    // l=1,2,6
-    //mapping[0] = 0
-    //mapping[1] = 3
-    //mapping[2] = 4
-    //mapping[3] = 5
-
-    void printMap(const std::map<int, int> &myMap)
-    {
-      for (const auto &[key,val] : myMap) {
-        std::cout << "map[" << key << "] = " << val << std::endl;
-      }
     }
 
     int randomNumberNotFromList(int N, std::vector<int> l)

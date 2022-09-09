@@ -36,7 +36,7 @@ public:
 
       // Thats what I found on the internet and what succeeded...
       //
-      // Print the number of 2s that divide n
+      // Print the number of 2s that divide n      
       while (n % 2 == 0) {
           largestFactor = 2;
           n >>= 1; // equivalent to n /= 2
@@ -55,7 +55,7 @@ public:
               largestFactor = i;
               n = n / i;
           }
-        while (n % (i+2) == 0) {
+          while (n % (i+2) == 0) {
               largestFactor = i+2;
               n = n / (i+2);
           }
@@ -75,7 +75,7 @@ TEST(CLASSNAME, Test1)
 {    
     CLASSNAME instance;
 
-    long long num = 13195;
+    long long num = 13195;  // good verification: if you use 13195*2*2*2 instead, the result must remain equal
     auto result = instance.largestPrimeFactor(num);
     std::cout << "Largest primefactor of " << num << " is " << result << std::endl;
     ASSERT_EQ(result, 29);

@@ -20,61 +20,37 @@ public:
         cout << "Running " << VERSION_STRING(CLASSNAME) << "..." << endl;
     }
 
-    int maxIndex(const vector<int> &A)
+
+    // A = [8, 9, -1, -1]
+    // B = [1, 2]
+    void mergeArrays(vector<int>& A, const vector<int> B)
     {
-        if (A.empty())
-            return -1;
+      int writeIdx = A.size() - 1;
+      int readIdxB = B.size() - 1;
+      int readIdxA = writeIdx - readIdxB - 1;
 
-        int max_idx = -1;
-        int max_val = std::numeric_limits<int>::min();
-
-        for(int i=0; i<A.size(); i++)
-        {
-            if (A[i] > max_val)
-            {
-                max_val = A[i];
-                max_idx = i;
-            }
+      while (readIdxB >= 0) {
+        if (A[readIdxA] > B[readIdxB]) {
+          A[writeIdx] = A[readIdxA];
+          readIdxA--;
         }
-
-        return max_idx;
-    }
-
-    void mergeArrays(vector<int> &A, const vector<int> &B)
-    {
-        int a = maxIndex(A);    // oder: int a = std::max_element(A.begin(), A.end()) - A.begin();
-        int b = B.size() - 1;
-        int i = A.size()-1;
-        //cout << "a=" << a << "; b=" << b << "; i=" << i << endl;
-
-
-        if ( (i-a) != B.size() )
-        {
-            cerr << "Mismatch in vector lengths. Cannot proceed." << endl;
-            exit(-1);
+        else  {
+          A[writeIdx] = B[readIdxB];
+          readIdxB--;
         }
-
-
-        while(b>=0)
-        {
-            if (A[a] >= B[b])
-            {
-                A[i] = A[a];
-                a--;
-            }
-            else
-            {
-                A[i] = B[b];
-                b--;
-            }
-
-            i--;
-        }
+        writeIdx--;
+      }
     }
 };
 
+
+
+
+
+
+
 TEST(CLASSNAME, Test1)
-{    
+{
     CLASSNAME instance;
 
     vector<int> A = {1,3,5,7,9,11,13,15,17,19,-1,-1,-1,-1,-1};

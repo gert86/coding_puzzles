@@ -33,7 +33,7 @@ public:
 
       // iterate
       while (numFib < num) {
-        numFib = numLower + numHigher;
+
         if (numFib % 2 == 0) {
           numEvenFibonacci++;
           sumEvenFibonacci += numFib;

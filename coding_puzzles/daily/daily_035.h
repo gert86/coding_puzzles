@@ -15,6 +15,11 @@ using namespace Helper;
 //
 // For example, given the array ['G', 'B', 'R', 'R', 'B', 'R', 'G'], it should become ['R', 'R', 'R', 'G', 'G', 'B', 'B'].
 
+
+// Strategy:
+// First round:  swap non-R vs. R so that all R's are left
+// Second round: swap non-G vs. G so that all G's are left (starting at the first non-R position)
+
 class CLASSNAME
 {
 public:

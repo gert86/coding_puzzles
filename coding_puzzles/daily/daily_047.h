@@ -15,6 +15,13 @@ using namespace Helper;
 // For example, given [9, 11, 8, 5, 7, 10], you should return 5, since you could buy the stock at 5 dollars and sell it at 10 dollars.
 
 
+// Strategy:
+// Find rising price: A[i] > A[i-1]
+// Store the buy price A[i-1]
+// Proceed i++ as long as the price continues growing and keep track of the max. profit in each step
+// When finding a falling price A[j] < A[j-1], this is the new buy price
+// Repeat until finished
+
 class CLASSNAME
 {
 public:
@@ -95,9 +102,9 @@ public:
 TEST(CLASSNAME, Test1)
 {    
     CLASSNAME instance;
-
-    // Mode 1
     vector<int> prices = {9, 11, 8, 5, 7, 10};
+
+    // Mode 1    
     int max_profit_mode_1 = instance.getMaxProfit(prices);
     cout << "The maximum profit with these prices is " << max_profit_mode_1 << endl;
     ASSERT_EQ(5, max_profit_mode_1);

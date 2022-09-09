@@ -4,23 +4,24 @@
 
 using namespace std;
 
+template <class T=int>
 class QueueNode
 {
 private:
-    int        m_data;
+    T         m_data;
     QueueNode *m_next;
 
 public:
-    QueueNode(int val) : m_data(val), m_next(nullptr) {}
+    QueueNode(T val) : m_data(val), m_next(nullptr) {}
 
     virtual ~QueueNode() {}
 
-    int getData() const
+    T getData() const
     {
         return m_data;
     }
 
-    void setData(int val)
+    void setData(T val)
     {
         m_data = val;
     }
@@ -41,18 +42,19 @@ public:
     }
 };
 
+template <class T=int>
 class Queue
 {
 private:
-    QueueNode *m_first;
-    QueueNode *m_last;
+    QueueNode<T> *m_first;
+    QueueNode<T> *m_last;
 public:
     Queue() : m_first(nullptr), m_last(nullptr)  {}
 
-    void push(int val)
+    void push(T val)
     {
         // create new node and append it to last
-        auto *node = new QueueNode(val);
+        auto *node = new QueueNode<T>(val);
 
         if (m_last == nullptr)
         {
@@ -67,7 +69,7 @@ public:
         }
     }
 
-    int pop()
+    T pop()
     {
         if (m_first==nullptr)
         {
@@ -85,12 +87,12 @@ public:
             m_last = nullptr;
         }
 
-        int val = node->getData();
+        T val = node->getData();
         delete node;
         return val;
     }
 
-    int peek() const
+    T peek() const
     {
         if (m_first==nullptr)
         {

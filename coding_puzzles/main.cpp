@@ -61,6 +61,7 @@
 #include "other/interview_question_barraiser.h"
 #include "other/interview_question_phone.h"
 #include "other/util_tests.h"
+#include "other/hacker_rank_test.h"
 #include "other/template.h"    // copy from this for new tests
 
 using namespace std;

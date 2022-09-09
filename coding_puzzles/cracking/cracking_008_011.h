@@ -65,7 +65,7 @@ public:
           if (i-coin >= 0) {
             for (auto comboCopy : _cache[i-coin]) {
               comboCopy.push_back(coin);
-              std::sort(comboCopy.begin(), comboCopy.end());
+              std::sort(comboCopy.begin(), comboCopy.end());  // note: could also use priority queues, but they seem to have no std::less
               newCombos.insert(comboCopy);
             }
           }

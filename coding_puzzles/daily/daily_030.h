@@ -17,6 +17,19 @@ using namespace Helper;
 // (we cannot hold 5 since it would run off to the left), so we can trap 8 units of water.
 
 
+// Strategy:
+//
+//      x
+// x    x x
+// x  x x x
+// x xx xxx
+//  3213 3
+//
+// Find the largest wall
+// search right for the next lower and calculate volume in between
+// search left for the next lower and calculate volume in between
+// proceed right/left from there
+
 class CLASSNAME
 {
 public:
@@ -132,10 +145,9 @@ public:
 
         // find the largest element
         int largest_idx = searchRight(elevation_vector, 0);
-        int low_idx = largest_idx;
-        int high_idx = largest_idx;
 
         // continuously search to the right side for the next biggest index and calc. volume in between
+        int high_idx = largest_idx;
         while (true)
         {
             int next_high_idx = searchRight(elevation_vector, high_idx);
@@ -147,6 +159,7 @@ public:
         }
 
         // continuously search to the left side for the next biggest index and calc. volume in between
+        int low_idx = largest_idx;
         while (true)
         {
             int next_low_idx = searchLeft(elevation_vector, low_idx);

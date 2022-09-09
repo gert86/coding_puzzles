@@ -11,6 +11,26 @@ using namespace Helper;
 //
 // Given a N by M matrix of numbers, print out the matrix in a clockwise spiral.
 
+
+// Strategy and Example:
+//
+// 1   2  3  4  5
+// 6   7  8  9 10
+// 11 12 13 14 15
+// 16 17 18 19 20
+//
+// Rechts (c++)       Runter (r++)       Links (c--)        Rauf (r--)
+// 1 2 3 4 5          10 15 20           19 18 17 16        11  6
+// r=0, c=0..C-1      r=1..R-1, c=C-1    r=R-1, c=C-2..0    r=R-2..1, c=0
+//
+// Rechts (c++)       Runter (r++)       Links (c--)
+// 7  8  9            14                 13 12
+// r=1, c=1..C-2      r=2..R-2, c=C-2    r=R-2, c=C-3..1
+//
+// M[r][c]
+// R=4
+// C=5
+
 typedef vector<vector<int>> IntMatrix;
 
 class CLASSNAME

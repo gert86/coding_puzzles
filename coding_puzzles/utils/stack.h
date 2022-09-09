@@ -8,7 +8,7 @@ template <class T=int>
 class StackNode
 {
 private:
-    T        m_data;
+    T         m_data;
     StackNode *m_next;
 
 public:

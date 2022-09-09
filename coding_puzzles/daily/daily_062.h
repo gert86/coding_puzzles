@@ -16,6 +16,36 @@ using namespace Helper;
 //    Down, then right
 // Given a 5 by 5 matrix, there are 70 ways to get to the bottom-right.
 
+
+// Strategy:
+// iterating row (outer) and col(inner) we fill each   poss[r][c] = poss[r-1][c] + poss[r][c-1]
+// after 1st row
+// 1 1 1 1 1
+
+// after 2nd row
+// 1 1 1 1 1
+// 1 2 3 4 5
+
+// after 3rd row
+// 1  1  1  1  1
+// 1  2  3  4  5
+// 1  3  6 10 15
+
+// after 4th row
+// 1  1  1  1  1
+// 1  2  3  4  5
+// 1  3  6 10 15
+// 1  4 10 20 35
+
+// after 5th row
+// 1  1  1  1  1
+// 1  2  3  4  5
+// 1  3  6 10 15
+// 1  4 10 20 35
+// 1  5 15 35 70
+
+// no recursion or memo necessary
+
 class CLASSNAME
 {
 public:

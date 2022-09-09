@@ -11,8 +11,9 @@ using namespace Helper;
 //
 // Given a set of closed intervals, find the smallest set of numbers that covers all the intervals. If there are multiple smallest sets, return any of them.
 // For example, given the intervals [0, 3], [2, 6], [3, 4], [6, 9], one set of numbers that covers all these intervals is {3, 6}
-//
-//
+
+
+// Strategy and Example:
 // 0  1  2  3  4  5  6  7  8  9
 // [        ]                       0-3   requires 1 from {0,1,2,3}
 //       [           ]              2-6   requires 1 from {2,3,4,5,6}
@@ -31,12 +32,6 @@ public:
         cout << "Running " << VERSION_STRING(CLASSNAME) << "..." << endl;
     }
 
-    void printMap(const std::map<int, int> &myMap)
-    {
-      for (const auto &[key,val] : myMap) {
-        std::cout << "map[" << key << "] = " << val << std::endl;
-      }
-    }
 
     std::set<int> getIntersectionSet(std::vector<std::pair<int, int>> intervals)
     {

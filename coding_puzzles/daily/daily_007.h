@@ -13,6 +13,19 @@ using namespace Helper;
 // For example, the message '111' would give 3, since it could be decoded as 'aaa', 'ka', and 'ak'.
 // You can assume that the messages are decodable. For example, '001' is not allowed.
 
+// Strategy:
+// assume that for N-1 characters we have m possibilities to decode
+// bool validSingle = arr.substr(N,1) is a valid single digit [1-9]
+// bool validDouble = arr.substr(N-1,2) is a valid double digit [10-26]
+// if (validSingle && validDouble)
+//    possibilities[N] = possibilities[N-1]+1;
+// else if (validSingle && !validDouble)
+//    possibilities[N] = possibilities[N-1]
+// else if (validDouble && !validSingle)
+//    possibilities[N] = possibilities[N-1]
+// else if (!validDouble && !validSingle)
+//    return 0;
+
 class CLASSNAME
 {
 public:

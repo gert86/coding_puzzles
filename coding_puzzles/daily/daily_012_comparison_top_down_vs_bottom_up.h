@@ -13,7 +13,6 @@ using namespace Helper;
 // Given N, write a function that returns the number of unique ways you can climb the staircase. The order of the steps matters.
 
 // For example, if N is 4, then there are 5 unique ways:
-
 //     1, 1, 1, 1
 //     2, 1, 1
 //     1, 2, 1
@@ -25,7 +24,8 @@ using namespace Helper;
 
 
 // NOTE: Tried to solve the problem top-down (=from destination back to start) and bottom-up (=from start to destination).
-// CONCLUSION: Works both ways almost the same way (additional parameter needed for bottom-up). However, the BEST solution here is a non-recursive approach.
+// CONCLUSION: Works both ways almost the same way (additional parameter needed for bottom-up).
+// However, the BEST solution here is a non-recursive approach.
 //
 // Note that we want to find ALL possible solutions but do not need to store each possible solution (count is sufficient).
 // --> Compare with cracking_008_002, where we want only 1 possible solution but also print this solution.
@@ -65,7 +65,7 @@ public:
                 if (next_idx >= 0 && next_idx < memo.size() && memo[next_idx] != -1)
                     count += memo[next_idx];    // avoid recursion through memoization
                 else
-                    count += numPossibilities01(N-step_amount, valid_step_counts, memo);
+                    count += numPossibilities01(next_idx, valid_step_counts, memo);
             }
             return count;
         }

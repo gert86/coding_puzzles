@@ -12,6 +12,16 @@ using namespace Helper;
 // The area of a circle is defined as πr^2. Estimate π to 3 decimal places using a Monte Carlo method.
 // Hint: The basic equation of a circle is x2 + y2 = r2.
 
+// Strategy:
+// for i = 1-10000
+//   x = random(0.0,1.0)
+//   y = random(0.0,1.0)
+//   if (sqrt(x*x + y*y) < 1.0)
+//     numInliers++;
+//
+// estimatedPi = 4.0 * float(numInliers)/10000;  // weil 4 quadranten
+
+
 class CLASSNAME
 {
 public:

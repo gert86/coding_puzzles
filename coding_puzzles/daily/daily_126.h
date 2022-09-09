@@ -22,7 +22,7 @@ public:
     }
 
     template<typename T>
-    void rotateByK(std::deque<T> &vec, int k)
+    void rotateByK(std::queue<T> &vec, int k)
     {
         // Error case
         if (k<0 || k>vec.size())
@@ -41,8 +41,8 @@ public:
         for (int i=0; i<k; i++)
         {
             int curr = vec.front();
-            vec.pop_front();
-            vec.push_back(curr);
+            vec.pop();
+            vec.push(curr);
         }
     }
 };
@@ -51,67 +51,76 @@ TEST(CLASSNAME, Test1)
 {    
     CLASSNAME instance;
 
-    // NOTE: I am using a deque, because this is the best suited data structure for this problem.
+    // NOTE: I am using a queue or deque, because this is the best suited data structure for this problem.
     //       If necessary convert from and to vector
     int k = 0;
-    std::deque<int> original_array{1, 2, 3, 4, 5, 6};
-    std::deque<int> array;
-    std::deque<int> expected_result;
+    std::queue<int> original_array;
+    for (auto &i : {1, 2, 3, 4, 5, 6})  original_array.push(i);
+    std::queue<int> array;
+    std::queue<int> expected_result;
 
     k = 0;
-    expected_result = {1, 2, 3, 4, 5, 6};
+    while(!expected_result.empty()) expected_result.pop();
+    for (auto &i : {1, 2, 3, 4, 5, 6})  expected_result.push(i);
     array = original_array;
     instance.rotateByK(array, k);
-    cout << "The resulting deque with k = " << k << " is " << printDeque(array)  << endl;
+    cout << "The resulting queue with k = " << k << " is " << printQueue(array)  << endl;
     ASSERT_EQ(expected_result, array);
 
     k = 1;
-    expected_result = {2, 3, 4, 5, 6, 1};
+    while(!expected_result.empty()) expected_result.pop();
+    for (auto &i : {2, 3, 4, 5, 6, 1})  expected_result.push(i);
     array = original_array;
     instance.rotateByK(array, k);
-    cout << "The resulting deque with k = " << k << " is " << printDeque(array)  << endl;
+    cout << "The resulting queue with k = " << k << " is " << printQueue(array)  << endl;
     ASSERT_EQ(expected_result, array);
 
     k = 2;
-    expected_result = {3, 4, 5, 6, 1, 2};
+    while(!expected_result.empty()) expected_result.pop();
+    for (auto &i : {3, 4, 5, 6, 1, 2})  expected_result.push(i);
     array = original_array;
     instance.rotateByK(array, k);
-    cout << "The resulting deque with k = " << k << " is " << printDeque(array)  << endl;
+    cout << "The resulting queue with k = " << k << " is " << printQueue(array)  << endl;
     ASSERT_EQ(expected_result, array);
 
     k = 3;
-    expected_result = {4, 5, 6, 1, 2, 3};
+    while(!expected_result.empty()) expected_result.pop();
+    for (auto &i : {4, 5, 6, 1, 2, 3})  expected_result.push(i);
     array = original_array;
     instance.rotateByK(array, k);
-    cout << "The resulting deque with k = " << k << " is " << printDeque(array)  << endl;
+    cout << "The resulting queue with k = " << k << " is " << printQueue(array)  << endl;
     ASSERT_EQ(expected_result, array);
 
     k = 4;
-    expected_result = {5, 6, 1, 2, 3, 4};
+    while(!expected_result.empty()) expected_result.pop();
+    for (auto &i : {5, 6, 1, 2, 3, 4})  expected_result.push(i);
     array = original_array;
     instance.rotateByK(array, k);
-    cout << "The resulting deque with k = " << k << " is " << printDeque(array)  << endl;
+    cout << "The resulting queue with k = " << k << " is " << printQueue(array)  << endl;
     ASSERT_EQ(expected_result, array);
 
     k = 5;
-    expected_result = {6, 1, 2, 3, 4, 5};
+    while(!expected_result.empty()) expected_result.pop();
+    for (auto &i : {6, 1, 2, 3, 4, 5})  expected_result.push(i);
     array = original_array;
     instance.rotateByK(array, k);
-    cout << "The resulting deque with k = " << k << " is " << printDeque(array)  << endl;
+    cout << "The resulting queue with k = " << k << " is " << printQueue(array)  << endl;
     ASSERT_EQ(expected_result, array);
 
     k = 6;
-    expected_result = {1, 2, 3, 4, 5, 6};
+    while(!expected_result.empty()) expected_result.pop();
+    for (auto &i : {1, 2, 3, 4, 5, 6})  expected_result.push(i);
     array = original_array;
     instance.rotateByK(array, k);
-    cout << "The resulting deque with k = " << k << " is " << printDeque(array)  << endl;
+    cout << "The resulting queue with k = " << k << " is " << printQueue(array)  << endl;
     ASSERT_EQ(expected_result, array);
 
     k = 7;
-    expected_result = {1, 2, 3, 4, 5, 6};
+    while(!expected_result.empty()) expected_result.pop();
+    for (auto &i : {1, 2, 3, 4, 5, 6})  expected_result.push(i);
     array = original_array;
     instance.rotateByK(array, k);
-    cout << "The resulting deque with k = " << k << " is " << printDeque(array)  << endl;
+    cout << "The resulting queue with k = " << k << " is " << printQueue(array)  << endl;
     ASSERT_EQ(expected_result, array);
 
 }

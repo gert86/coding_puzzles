@@ -12,6 +12,20 @@ using namespace Helper;
 // Given an integer k and a string s, find the length of the longest substring that contains at most k distinct characters.
 // For example, given s = "abcba" and k = 2, the longest substring with k distinct characters is "bcb".
 
+// Strategy:
+// Start at index (^) and proceed until one to far (x) - track in hash set
+// store the substring length, excluding the last step
+// Find the new start position by going left from x, count the unique chars, go one too far too and finally one back to the right
+// continue until the last character (/)
+
+// abbabcaaabc
+// ^... x        -> 5 (abbab)
+//     ^ x       -> 2 (bc)
+//      ^   x    -> 4 (caaa)
+//       ^   x   -> 4 (aaab)
+//          ^/   -> 2 (bc)
+
+
 class CLASSNAME
 {
 public:
@@ -59,7 +73,7 @@ public:
             }
 
 
-            // 2a: Right index went too far; proceed backward with left_idx from there as far as possible
+            // 2a: Right index went too far; proceed backward from there as far as possible and use as new left_idx
             distinct_chars.clear();
             left_idx = right_idx;
             distinct_chars.insert( str[left_idx] );

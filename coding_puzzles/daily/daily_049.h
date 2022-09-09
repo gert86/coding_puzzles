@@ -14,6 +14,18 @@ using namespace Helper;
 // Given the array [-5, -1, -8, -9], the maximum sum would be 0, since we would not take any elements.
 // Do this in O(N) time.
 
+
+// Strategy:
+// 34, -50, 42, 14, -5, 86
+// 34:        -> 34 -> store as max. series: [0,0]
+//-50: 34-50  -> <0 forget
+//       -50  -> <0 do not consider as new start
+// 42:        -> 42 best so far -> store as max. series: [2,2]
+// 14:        -> 42+14=56 even better -> store as max. series: [2,3]
+// -5:        -> 42+14-5=51 -> not max, but still > 0 so continue with this series
+// 86:        -> 42+14-5+86 -> 137 new max
+
+
 class CLASSNAME
 {
 public:
@@ -22,55 +34,24 @@ public:
         cout << "Running " << VERSION_STRING(CLASSNAME) << "..." << endl;
     }
 
-
-    int findMaxSubarray(const vector<int> &array)
+    int findMaxSubarray(const vector<int>& array)
     {
-        vector< pair<int, int> > maxima;
-        maxima.resize( array.size() );
-
-        for (int i=0; i<array.size(); i++)
-        {
-            if (i==0)
-            {
-                maxima[0] = std::make_pair<int,int>((int)array[0], 0);
-            }
-            else
-            {
-                if (maxima[i-1].first <= 0)
-                {
-                    maxima[i] = std::make_pair<int, int>((int)array[i], (int)i);
-                }
-                else
-                {
-                    maxima[i] = std::make_pair<int, int>((int)(maxima[i-1].first + array[i]), (int)(maxima[i-1].second));
-                }
-            }
+      int currSum = 0;
+      int bestSum = 0;
+      for (int i=0; i<array.size(); i++) {
+        //std::cout << "val = " << array[i] << std::endl;
+        currSum += array[i];
+        if (currSum > bestSum) {
+          bestSum = currSum;
+          //std::cout << "  bestSum increased to  " << bestSum << std::endl;
         }
-
-        int curr_max = 0;
-        int curr_max_idx = -1;
-        for (int i=0; i<maxima.size(); i++)
-        {
-            if (maxima[i].first > 0)
-            {
-                if (maxima[i].first > curr_max)
-                {
-                    curr_max = maxima[i].first;
-                    curr_max_idx = i;
-                }
-            }
+        else if (currSum < 0) {
+          //std::cout << "  currSum reset to  0" << std::endl;
+          currSum = 0;
         }
+      }
 
-        if (curr_max_idx >= 0)
-        {
-            cout << "The max sum is " << curr_max << " and it goes from " << maxima[curr_max_idx].second << " to " << curr_max_idx << endl;
-        }
-        else
-        {
-             cout << "The max sum is " << curr_max << endl;
-        }
-
-        return curr_max;
+      return bestSum;
     }
 };
 
