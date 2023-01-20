@@ -1,8 +1,9 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "Board.h"
-#include "Piece.h"
+#include "Types.h"
+
+class Board;
 
 class Game
 {
@@ -11,11 +12,13 @@ public:
   int mainLoop();
 
 private:
-  Board* _board;
   void showPrompt() const;
   bool parsePieceId(const std::string& inputStr, char& pieceId);
   bool parseIdsAndCoordinate(const std::string& inputStr,
                              char& pieceId, int& configId, Coord& coord);
+
+private:
+  Board* _board;
 };
 
 

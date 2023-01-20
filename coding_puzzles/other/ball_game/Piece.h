@@ -5,55 +5,53 @@
 
 class Piece
 {
-// Helper functions
+public:
+  static std::vector<BoardPlacementEntry> determinePlaceableOptions(const BoardState& boardState, Piece* piece);
+
+public:
+  void postInit(const BoardState& boardState);  // TODO: make sure this is called from all derived instances before usage
+  void drawBaseConfiguration() const;
+  void drawAllConfigurations() const;
+  const Geometries& getGeometryConfigs() const;
+  size_t getNumGeometries() const;
+  const std::vector<BoardPlacementEntry>& getPlaceableOptions() const;
+  size_t getNumPlaceableOptions() const;
+  char id() const;
+  size_t getExtent() const;
+
+protected:
+  //! defines base geometry
+  virtual void init() = 0;
+
+protected:
+  char _id;
+  Geometry _baseGeometry;
+
 private:
   static void drawGeometry(const Geometry& geometry);
-
   static Geometry transformGeometry(const Geometry& geometry, GeometryModification modification);
 
-  // adds up to 7 additional geometries through rotation and mirroring
+private:
+  //! adds up to 7 additional geometries through rotation and mirroring
   void obtainGeometriesFromBase();
   void obtainPlaceableOptions(const BoardState& boardState);
 
 private:
   Geometries _geometryConfigurations;
   std::vector<BoardPlacementEntry> _placableOptions;
-
-protected:
-  virtual void init() = 0;         // defines base geometry
-
-protected:
-  char _id;
-  Geometry _baseGeometry;
-
-public:
-  static std::vector<BoardPlacementEntry> determinePlaceableOptions(const BoardState& boardState, Piece* piece);
-
-public:
-  // TODO: make sure this is called from all derived ones before usage
-  void postInit(const BoardState& boardState);
-
-  void drawBaseConfiguration() const;
-
-  void drawAllConfigurations() const;
-
-  const Geometries& getGeometryConfigs() const;
-
-  size_t getNumGeometries() const;
-
-  const std::vector<BoardPlacementEntry>& getPlaceableOptions() const;
-
-  size_t getNumPlaceableOptions() const;
-
-  char id() const;
-
-  size_t getExtent() const;
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// TODO: Use templates
 
 class PieceA : public Piece
 {
 public:
-  PieceA();
+  PieceA()
+  {
+    init();
+  }
 private:
   void init() override;
 };
@@ -61,7 +59,10 @@ private:
 class PieceB : public Piece
 {
 public:
-  PieceB();
+  PieceB()
+  {
+    init();
+  }
 private:
   void init() override;
 };
@@ -69,7 +70,10 @@ private:
 class PieceC : public Piece
 {
 public:
-  PieceC();
+  PieceC()
+  {
+    init();
+  }
 private:
   void init() override;
 };
@@ -77,7 +81,10 @@ private:
 class PieceD : public Piece
 {
 public:
-  PieceD();
+  PieceD()
+  {
+    init();
+  }
 private:
   void init() override;
 };
@@ -85,7 +92,10 @@ private:
 class PieceE : public Piece
 {
 public:
-  PieceE();
+  PieceE()
+  {
+    init();
+  }
 private:
   void init() override;
 };
@@ -93,7 +103,10 @@ private:
 class PieceF : public Piece
 {
 public:
-  PieceF();
+  PieceF()
+  {
+    init();
+  }
 private:
   void init() override;
 };
@@ -101,7 +114,10 @@ private:
 class PieceG : public Piece
 {
 public:
-  PieceG();
+  PieceG()
+  {
+    init();
+  }
 private:
   void init() override;
 };
@@ -109,7 +125,10 @@ private:
 class PieceH : public Piece
 {
 public:
-  PieceH();
+  PieceH()
+  {
+    init();
+  }
 private:
   void init() override;
 };
@@ -117,7 +136,10 @@ private:
 class PieceI : public Piece
 {
 public:
-  PieceI();
+  PieceI()
+  {
+    init();
+  }
 private:
   void init() override;
 };
@@ -125,7 +147,10 @@ private:
 class PieceJ : public Piece
 {
 public:
-  PieceJ();
+  PieceJ()
+  {
+    init();
+  }
 private:
   void init() override;
 };
@@ -133,7 +158,10 @@ private:
 class PieceK : public Piece
 {
 public:
-  PieceK();
+  PieceK()
+  {
+    init();
+  }
 private:
   void init() override;
 };
@@ -141,7 +169,10 @@ private:
 class PieceL : public Piece
 {
 public:
-  PieceL();
+  PieceL()
+  {
+    init();
+  }
 private:
   void init() override;
 };

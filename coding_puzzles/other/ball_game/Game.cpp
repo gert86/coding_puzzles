@@ -1,4 +1,6 @@
 #include "Game.h"
+#include "Board.h"
+#include "Piece.h"
 
 void Game::init()
 {
@@ -12,7 +14,8 @@ int Game::mainLoop()
   while (true) {
     getline(cin, input);
 
-    if (input.empty()) {  // allow scrolling
+    if (input.empty()) {
+      // "scrolling"
       cout << endl;
       continue;
     }
@@ -119,7 +122,7 @@ int Game::mainLoop()
     }
     else if (input == "f") {
       // FIND A SOLUTION FOR ALL UNPLACED PIECES
-      if (_board->findPlacementForAll()) {
+      if (_board->solveGame()) {
         cout << "Success -> solved the board" << std::endl;
       }
       else {
@@ -149,8 +152,8 @@ void Game::showPrompt() const
   cout << "s ... show all pieces (in base configuration)" << endl;
   cout << "s <piece_id> ... show details for piece" << endl;
   cout << "p <piece_id> <config_id> <x> <y> ... place a piece" << endl;
-  cout << "x <piece_id> ... unplace a piece" << endl;
-  cout << "f ... find a placment for all unplaced pieces" << endl;
+  cout << "x <piece_id> ... remove a piece" << endl;
+  cout << "f ... find a placement for all unplaced pieces" << endl;
   cout << "q...quit" << endl;
 }
 
@@ -159,8 +162,8 @@ bool Game::parsePieceId(const string &inputStr, char &pieceId)
   istringstream ss(inputStr);
   bool success = false;
   if(ss >> pieceId) {
-    //cout << "Parsed: pieceId=" << pieceId << endl;
     success = true;
+    //cout << "Parsed: pieceId=" << pieceId << endl;    
   }
   return (success==true && pieceId!=' ');
 }
@@ -176,6 +179,5 @@ bool Game::parseIdsAndCoordinate(const string &inputStr, char &pieceId, int &con
     //     << "; xBoard=" << coord.x
     //     << "; yBoard=" << coord.y << endl;
   }
-
   return (success==true && pieceId!=' ' && configId!=-1 && coord.x!=-1 && coord.y!=-1);
 }

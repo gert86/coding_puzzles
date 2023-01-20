@@ -3,7 +3,7 @@
 
 bool Board::isPlaceable(Piece *piece, int configuration, const Coord &coord, const BoardState &boardBefore, BoardState &boardAfter)
 {
-  auto boardModified = boardBefore;
+  auto boardDirty = boardBefore;
 
   auto geometry = piece->getGeometryConfigs()[configuration];
   for (const auto& localCoord : geometry) {
@@ -13,11 +13,11 @@ bool Board::isPlaceable(Piece *piece, int configuration, const Coord &coord, con
       return false;
     }
     else {
-      boardModified[y][x] = piece->id();
+      boardDirty[y][x] = piece->id();
     }
   }
 
-  boardAfter = boardModified;  // only on success, boardAfter will be updated
+  boardAfter = boardDirty;  // only on success, boardAfter will be updated
   return true;
 }
 
@@ -27,16 +27,6 @@ Board::Board()
   initPieces();
 }
 
-const std::map<Piece *, BoardPlacementEntry> Board::getPlacedPieces() const
-{
-  return _currPlacedPieces;
-}
-
-const std::vector<Piece *> Board::getUnplacedPieces() const
-{
-  return _currUnplacedPieces;
-}
-
 void Board::initFields()
 {
   _numFreeFields = 0;
@@ -44,35 +34,23 @@ void Board::initFields()
   _numUnavailableFields = 0;
   _fields.clear();
 
-
   auto column = std::vector<char>(9, FIELD_EMPTY_ID);
   _fields = BoardState(9, column);
-  _fields[0][6] = FIELD_UNAVAILABLE_ID;
-  _fields[0][7] = FIELD_UNAVAILABLE_ID;
-  _fields[0][8] = FIELD_UNAVAILABLE_ID;
-  _fields[1][7] = FIELD_UNAVAILABLE_ID;
-  _fields[1][8] = FIELD_UNAVAILABLE_ID;
-  _fields[2][8] = FIELD_UNAVAILABLE_ID;
-  _fields[3][2] = FIELD_UNAVAILABLE_ID;
-  _fields[5][7] = FIELD_UNAVAILABLE_ID;
-  _fields[5][8] = FIELD_UNAVAILABLE_ID;
-  _fields[6][0] = FIELD_UNAVAILABLE_ID;
-  _fields[6][6] = FIELD_UNAVAILABLE_ID;
-  _fields[6][7] = FIELD_UNAVAILABLE_ID;
-  _fields[6][8] = FIELD_UNAVAILABLE_ID;
-  _fields[7][0] = FIELD_UNAVAILABLE_ID;
-  _fields[7][1] = FIELD_UNAVAILABLE_ID;
-  _fields[7][5] = FIELD_UNAVAILABLE_ID;
-  _fields[7][6] = FIELD_UNAVAILABLE_ID;
-  _fields[7][7] = FIELD_UNAVAILABLE_ID;
-  _fields[7][8] = FIELD_UNAVAILABLE_ID;
-  _fields[8][0] = FIELD_UNAVAILABLE_ID;
-  _fields[8][1] = FIELD_UNAVAILABLE_ID;
-  _fields[8][2] = FIELD_UNAVAILABLE_ID;
-  _fields[8][5] = FIELD_UNAVAILABLE_ID;
-  _fields[8][6] = FIELD_UNAVAILABLE_ID;
-  _fields[8][7] = FIELD_UNAVAILABLE_ID;
-  _fields[8][8] = FIELD_UNAVAILABLE_ID;
+
+  // Picaso couldn't have made it better
+  std::vector<Coord> unavailableCoords = {                                    {6,0},{7,0},{8,0},
+                                                                                    {7,1},{8,1},
+                                                                                          {8,2},
+                                                      {2,3},
+
+                                                                                    {7,5},{8,5},
+                                          {0,6},                              {6,6},{7,6},{8,6},
+                                          {0,7},{1,7},                  {5,7},{6,7},{7,7},{8,7},
+                                          {0,8},{1,8},{2,8},            {5,8},{6,8},{7,8},{8,8}
+                                         };
+  for (const auto &[x, y] : unavailableCoords) {
+    _fields[y][x] = FIELD_UNAVAILABLE_ID;  // y=row, x=column
+  }
 
   for (const auto& column : _fields) {
     for (const auto& field : column) {
@@ -141,8 +119,16 @@ void Board::initPieces()
   auto l = new PieceL();
   l->postInit(_fields);
   _currUnplacedPieces.push_back(l);
+}
 
-  cout << "After initPieces the _currUnplacedPieces has size: " << _currUnplacedPieces.size() << endl;
+const std::map<Piece*, BoardPlacementEntry>& Board::getPlacedPieces() const
+{
+  return _currPlacedPieces;
+}
+
+const std::vector<Piece*>& Board::getUnplacedPieces() const
+{
+  return _currUnplacedPieces;
 }
 
 void Board::draw() const
@@ -155,7 +141,7 @@ void Board::draw() const
   auto numRows = _fields.size();
   auto numCols = _fields[0].size();  // TODO: Use max of all inner vectors to support irregular fields
 
-  // header 0 1 2 3 ...
+  // header on x-axis: 0 1 2 3 ...
   cout << "  ";
   for (size_t c=0; c<numCols; c++) {
     cout << c << " ";
@@ -165,25 +151,21 @@ void Board::draw() const
   for (size_t r=0; r<numRows; r++) {
     const auto& row = _fields[r];
 
-    cout << r << " ";
+    cout << r << " ";  // header on y-axis
     for (size_t c=0; c<row.size(); c++) {
       const auto& field = row[c];
       cout << field << " ";
     }
     cout << endl;
   }
-  cout << "Free Fields: " << _numFreeFields << endl;
+  cout << endl;
+  cout << "Free Fields: "     << _numFreeFields     << endl;
   cout << "Occupied Fields: " << _numOccupiedFields << endl;
   cout << endl << endl;
 }
 
-bool Board::allFieldsOccupied() const
+void Board::showAllPieces() const
 {
-  return _numFreeFields == 0;
-}
-
-void Board::showAllPieces()
-{  
   cout << "UNPLACED: " << _currUnplacedPieces.size() << endl;
   cout << "----------------------------------------" << endl;
   size_t sumUnplacedExtents = 0;
@@ -191,60 +173,43 @@ void Board::showAllPieces()
     cout << p->id() << ": Supports " << p->getNumGeometries() << " configurations" << endl;
     p->drawBaseConfiguration();
     sumUnplacedExtents += p->getExtent();
-  }  
+  }
 
   cout << "PLACED: " << _currPlacedPieces.size() << endl;
   cout << "----------------------------------------" << endl;
   size_t sumPlacedExtents = 0;
   for (const auto& [p, placement] : _currPlacedPieces) {
-    cout << p->id() << ": Placed in configuration " << placement._geometryIndex
-         << " at position " << placement._coordOnBoard.x << "," << placement._coordOnBoard.y << endl;
+    cout << p->id() << ": Placed in configuration " << placement._configurationIdx
+         << " at position " << placement._topLeftOnBoard.x << "," << placement._topLeftOnBoard.y << endl;
     p->drawBaseConfiguration();
     sumPlacedExtents += p->getExtent();
   }
 
   cout << endl << endl;
   cout << "-----> " << _currUnplacedPieces.size() << " unplaced pieces can fill " << sumUnplacedExtents << " more fields" << endl;
-  cout << "-----> " << _currPlacedPieces.size() << "  placed pieces currently fill " << sumPlacedExtents << " fields" << endl;
+  cout << "-----> " << _currPlacedPieces.size()   << " placed pieces currently fill " << sumPlacedExtents << " fields" << endl;
 
   if (_currUnplacedPieces.size() == 0)
     return;
 
-//  long long numPossibilitiesBruteForce = 1;
-//  for (const auto &p : _currUnplacedPieces) {
-//    numPossibilitiesBruteForce *= p->getNumPlaceableOptions();
-//  }
-//  cout << "-----> " << numPossibilitiesBruteForce << "  possibilities for brute-force attempt!" << endl;
-
-  // statistics
-  std::map<Piece* , std::vector<BoardPlacementEntry>> remainingPossibilities;
-  long long numPossibilitiesBruteForce = 1;
-  long long numPossibilitiesCurrentBoard = 1;
-  for (const auto& piece : _currUnplacedPieces) {
-    numPossibilitiesBruteForce *= piece->getNumPlaceableOptions();
-    auto remainingOptionsForPiece = Piece::determinePlaceableOptions(_fields, piece);
-    remainingPossibilities[piece] = remainingOptionsForPiece;
-    numPossibilitiesCurrentBoard *= remainingOptionsForPiece.size();
-    cout << piece->id() << " had " << piece->getNumPlaceableOptions() << " initial placement options, "
-         << remainingOptionsForPiece.size() << " remain with current board" << endl;
-  }
-  cout << "Brute-force: " << numPossibilitiesBruteForce << ", Current board: " << numPossibilitiesCurrentBoard << endl;
+  // print statistics
+  getAndPrintRemainingPlacementOptions();
 }
 
-void Board::showPieceDetails(char pieceId)
+void Board::showPieceDetails(char pieceId) const
 {
   Piece* piece = nullptr;
   bool placed = false;
   int placedConfiguration = -1;
-  Coord placedPos(-1,-1);
+  Coord placedPos;
 
   // check if placed
   for (const auto& [p, placement] : _currPlacedPieces) {
     if (p->id() == pieceId) {
       piece = p;
       placed = true;
-      placedConfiguration = placement._geometryIndex;
-      placedPos = placement._coordOnBoard;
+      placedConfiguration = placement._configurationIdx;
+      placedPos = placement._topLeftOnBoard;
       break;
     }
   }
@@ -281,25 +246,14 @@ bool Board::tryPlacePiece(Piece *piece, int configuration, const Coord &coord)
   if (!isPlaceable(piece, configuration, coord, _fields, _fields))
     return false;
 
-  // from unplaced to placed
-  BoardPlacementEntry newPlacement(configuration, coord);
-  _currPlacedPieces[piece] = newPlacement;
+  // transition from unplaced(free) to placed(occupied)
   _currUnplacedPieces.erase(std::find(_currUnplacedPieces.begin(), _currUnplacedPieces.end(), piece));
-  _numOccupiedFields += piece->getExtent();
   _numFreeFields -= piece->getExtent();
-
-  if (_numFreeFields == 0) {
-    cout << "CONGRATULATIONS!" << endl;
-  }
+  _currPlacedPieces[piece] = BoardPlacementEntry(configuration, coord);
+  _numOccupiedFields += piece->getExtent();
   return true;
 }
 
-std::pair<bool, BoardPlacementEntry> Board::tryPlacePieceAnywhere(Piece *piece)
-{
-  // TODO
-  BoardPlacementEntry dummy;
-  return std::make_pair(false, dummy);
-}
 
 bool Board::removePlacedPiece(Piece *piece)
 {
@@ -307,37 +261,72 @@ bool Board::removePlacedPiece(Piece *piece)
   assert(piece && piece->id() != ' ');
   assert(_currPlacedPieces.find(piece) != _currPlacedPieces.end());
 
-  // get placment
+  // get placement
   auto placement = _currPlacedPieces[piece];
 
   // adapt field states
-  auto geometry = piece->getGeometryConfigs()[placement._geometryIndex];
+  auto geometry = piece->getGeometryConfigs()[placement._configurationIdx];
   for (const auto& localCoord : geometry) {
-    auto x = localCoord.x + placement._coordOnBoard.x;
-    auto y = localCoord.y + placement._coordOnBoard.y;
+    auto x = localCoord.x + placement._topLeftOnBoard.x;
+    auto y = localCoord.y + placement._topLeftOnBoard.y;
     assert ((int)_fields.size() > y && (int)_fields[y].size() > x && _fields[y][x] != FIELD_EMPTY_ID && _fields[y][x] != FIELD_UNAVAILABLE_ID);
     _fields[y][x] = FIELD_EMPTY_ID;
   }
 
-  // from placed to unplaced
+  // transition from placed(occupied) to unplaced(free)
   _currPlacedPieces.erase(_currPlacedPieces.find(piece));
-  _currUnplacedPieces.push_back(piece);
   _numOccupiedFields -= piece->getExtent();
+  _currUnplacedPieces.push_back(piece);
   _numFreeFields += piece->getExtent();
   return true;
 }
 
-
-bool Board::solveBoard(std::map<Piece*, std::vector<BoardPlacementEntry>> &remainingPlacements)
+bool Board::solveGame()
 {
-  size_t atBegin = _currUnplacedPieces.size();
-  auto spaceStr = [atBegin]()
-  {
-    std::stringstream ss;
-    for (size_t i=0; i < atBegin; i++)
-      ss << " ";
-    return ss.str();
-  };
+  // check if unplaced pieces can exactly fill up the unplaced spots
+  int sumUnplacedExtents = 0;
+  for (const auto& p : _currUnplacedPieces) {
+    sumUnplacedExtents += p->getExtent();
+  }
+  if (sumUnplacedExtents != _numFreeFields) {
+    cerr << "Can't find overall placement. Unplaced piece fields sum up to "
+         << sumUnplacedExtents << " but there are " << _numFreeFields << " free fields." << endl;
+    return false;
+  }
+
+  // are we done already?
+  if (_currUnplacedPieces.empty()) {
+    cout << "No more unplaced pieces, game is solved already!" << endl;
+    return true;
+  }
+
+  // print statistics and update remainig possibilities
+  auto remainingPossibilities = getAndPrintRemainingPlacementOptions();
+
+  // restore original state if solving was not successful
+  auto startTime = std::chrono::steady_clock::now();
+  cout << "Searching for a solution..." << endl;
+  Board backup(*this);
+  if (solveRecursive(remainingPossibilities) == false) {
+    *this = backup;
+    return false;
+  }
+
+  std::chrono::duration<double> diff = std::chrono::steady_clock::now() - startTime;
+  cout << "solving took " << diff.count() << " seconds" << endl;
+  return true;
+}
+
+bool Board::solveRecursive(std::map<Piece*, std::vector<BoardPlacementEntry>> &remainingPlacements)
+{
+//  size_t atBegin = _currUnplacedPieces.size();
+//  auto spaceStr = [atBegin]()
+//  {
+//    std::stringstream ss;
+//    for (size_t i=0; i < atBegin; i++)
+//      ss << " ";
+//    return ss.str();
+//  };
 
 
   // ends the recursion
@@ -360,13 +349,13 @@ bool Board::solveBoard(std::map<Piece*, std::vector<BoardPlacementEntry>> &remai
   remainingPlacements[currPiece].pop_back();
 
   // does it work?
-  if (!tryPlacePiece(currPiece, nextPlacementForPiece._geometryIndex, nextPlacementForPiece._coordOnBoard)) {
+  if (!tryPlacePiece(currPiece, nextPlacementForPiece._configurationIdx, nextPlacementForPiece._topLeftOnBoard)) {
     // placement does not work in this step, maybe with the next placement...
 //    cout << spaceStr() << "#### 3. placement option for "  << currPiece->id() << "@" << nextPlacementForPiece._geometryIndex
 //         << " at " << nextPlacementForPiece._coordOnBoard.x << "/" << nextPlacementForPiece._coordOnBoard.y
 //         << " NOT POSSIBLE. Recurse with " << remainingPlacements[currPiece].size()
 //         << " alternative placements left..." << endl;
-    return solveBoard(remainingPlacements);
+    return solveRecursive(remainingPlacements);
   }
 
   // piece was placed successfully (was therefore removed from _currUnplacedPieces in tryPlacePiece already)
@@ -375,7 +364,7 @@ bool Board::solveBoard(std::map<Piece*, std::vector<BoardPlacementEntry>> &remai
 //       << " POSSIBLE. Remaining unplaced pieces: " << _currUnplacedPieces.size() << endl;
 
   // can it be solved like this?
-  if (solveBoard(remainingPlacements)) {
+  if (solveRecursive(remainingPlacements)) {
 //    cout << spaceStr() << "#### 5. Awesome, we are done" << endl;
     return true;
   }
@@ -392,50 +381,22 @@ bool Board::solveBoard(std::map<Piece*, std::vector<BoardPlacementEntry>> &remai
 //       << " was a DEAD END. Re-added it and recurse with " << remainingPlacements[currPiece].size()
 //       << " options. Remaining unplaced pieces: " << _currUnplacedPieces.size() << endl;
 
-  return solveBoard(remainingPlacements);
+  return solveRecursive(remainingPlacements);
 }
 
-bool Board::findPlacementForAll()
+std::map<Piece*, std::vector<BoardPlacementEntry>> Board::getAndPrintRemainingPlacementOptions() const
 {
-  // check if we have the exact amount of pieces and free fields
-  int sumUnplacedExtents = 0;
-  for (const auto& p : _currUnplacedPieces) {
-    sumUnplacedExtents += p->getExtent();
-  }
-  if (sumUnplacedExtents != _numFreeFields) {
-    cerr << "Can't find overall placment. Unplaced piece fields sum up to "
-         << sumUnplacedExtents << " but there are " << _numFreeFields << " free fields." << endl;
-    return false;
-  }
-
-  // are we done already
-  if (_currUnplacedPieces.empty()) {
-    cout << "No more unplaced pieces, game is solved already!" << endl;
-    return true;
-  }
-
-  // statistics
-  std::map<Piece* , std::vector<BoardPlacementEntry>> remainingPossibilities;
+  std::map<Piece*, std::vector<BoardPlacementEntry>> remainingOptions;
   long long numPossibilitiesBruteForce = 1;
   long long numPossibilitiesCurrentBoard = 1;
   for (const auto& piece : _currUnplacedPieces) {
     numPossibilitiesBruteForce *= piece->getNumPlaceableOptions();
-
     auto remainingOptionsForPiece = Piece::determinePlaceableOptions(_fields, piece);
-    remainingPossibilities[piece] = remainingOptionsForPiece;
+    remainingOptions[piece] = remainingOptionsForPiece;
     numPossibilitiesCurrentBoard *= remainingOptionsForPiece.size();
-
     cout << piece->id() << " had " << piece->getNumPlaceableOptions() << " initial placement options, "
          << remainingOptionsForPiece.size() << " remain with current board" << endl;
   }
   cout << "Brute-force: " << numPossibilitiesBruteForce << ", Current board: " << numPossibilitiesCurrentBoard << endl;
-
-  Board backup(*this);
-  if (solveBoard(remainingPossibilities) == false) {
-    // restore original state
-    *this = backup;
-    return false;
-  }
-
-  return true;
+  return remainingOptions;
 }
