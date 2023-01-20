@@ -116,19 +116,26 @@ void Piece::obtainGeometriesFromBase()
 
 void Piece::obtainPlaceableOptions(const BoardState &boardState)
 {
+  _placableOptions = determinePlaceableOptions(boardState, this);
+  cout << "Piece " << _id << " has " << getPlaceableOptions().size() << " placeable options on the board" << endl;
+}
+
+std::vector<BoardPlacementEntry> Piece::determinePlaceableOptions(const BoardState &boardState, Piece *piece)
+{
+  std::vector<BoardPlacementEntry> options;
+
   BoardState dummy;
-  for(size_t c=0; c < getNumGeometries(); c++) {
+  for(size_t c=0; c < piece->getNumGeometries(); c++) {
     for(size_t y=0; y < boardState.size(); y++) {
       for(size_t x=0; x < boardState[0].size(); x++) {
         Coord coord(x, y);
-        if (Board::isPlaceable(this, c, coord, boardState, dummy)) {
-          _placableOptions.emplace_back(c, coord);
+        if (Board::isPlaceable(piece, c, coord, boardState, dummy)) {
+          options.emplace_back(c, coord);
         }
       }
     }
   }
-
-  cout << "Piece " << _id << " has " << getPlaceableOptions().size() << " placeable options on the board" << endl;
+  return options;
 }
 
 void Piece::postInit(const BoardState &boardState)
@@ -182,6 +189,28 @@ size_t Piece::getExtent() const
   return _baseGeometry.size();
 }
 
+PieceA::PieceA()
+{
+    init();
+}
+
+void PieceA::init()
+{
+  _id = 'A';
+  _baseGeometry = {{1,0}, {1,1}, {1,2}, {0,2}};
+}
+
+PieceB::PieceB()
+{
+    init();
+}
+
+void PieceB::init()
+{
+  _id = 'B';
+  _baseGeometry = {{1,0}, {0,1}, {1,1}, {0,2}, {1,2}};
+}
+
 PieceC::PieceC()
 {
   init();
@@ -193,6 +222,72 @@ void PieceC::init()
   _baseGeometry = {{1,0}, {1,1}, {1,2}, {1,3}, {0,3}};
 }
 
+PieceD::PieceD()
+{
+  init();
+}
+
+void PieceD::init()
+{
+  _id = 'D';
+  _baseGeometry = {{1,0}, {1,1}, {1,2}, {1,3}, {0,2}};
+}
+
+PieceE::PieceE()
+{
+  init();
+}
+
+void PieceE::init()
+{
+  _id = 'E';
+  _baseGeometry = {{1,0}, {1,1}, {1,2}, {0,2}, {0,3}};
+}
+
+PieceF::PieceF()
+{
+  init();
+}
+
+void PieceF::init()
+{
+  _id = 'F';
+  _baseGeometry = {{1,0}, {1,1}, {0,1}};
+}
+
+PieceG::PieceG()
+{
+  init();
+}
+
+void PieceG::init()
+{
+  _id = 'G';
+  _baseGeometry = {{2,0}, {2,1}, {2,2}, {1,2}, {0,2}};
+}
+
+PieceH::PieceH()
+{
+  init();
+}
+
+void PieceH::init()
+{
+  _id = 'H';
+  _baseGeometry = {{2,0}, {2,1}, {1,1}, {1,2}, {0,2}};
+}
+
+PieceI::PieceI()
+{
+  init();
+}
+
+void PieceI::init()
+{
+  _id = 'I';
+  _baseGeometry = {{0,0}, {0,1}, {1,1}, {2,1}, {2,0}};
+}
+
 PieceJ::PieceJ()
 {
   init();
@@ -202,4 +297,26 @@ void PieceJ::init()
 {
   _id = 'J';
   _baseGeometry = {{0,0}, {0,1}, {0,2}, {0,3}};
+}
+
+PieceK::PieceK()
+{
+  init();
+}
+
+void PieceK::init()
+{
+  _id = 'K';
+  _baseGeometry = {{0,0}, {0,1}, {1,1}, {1,0}};
+}
+
+PieceL::PieceL()
+{
+  init();
+}
+
+void PieceL::init()
+{
+  _id = 'L';
+  _baseGeometry = {{1,0}, {0,1}, {1,1}, {2,1}, {1,2}};
 }

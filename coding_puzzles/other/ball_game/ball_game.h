@@ -19,7 +19,6 @@ TEST(CLASSNAME, Test1)
     Game g;
     g.init();
     int ret = g.mainLoop();
-
     cout << "Program exited " << (ret==0 ? "normally" : "with failure") << " -> return code: " << ret << endl;
 }
 

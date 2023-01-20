@@ -16,6 +16,8 @@ private:
   std::map<Piece*, BoardPlacementEntry> _currPlacedPieces;
   std::vector<Piece*> _currUnplacedPieces;
 
+  // recursive function
+  bool solveBoard(std::map<Piece*, std::vector<BoardPlacementEntry>> &remainingPossibilities);
 public:
   static bool isPlaceable(Piece* piece, int configuration, const Coord& coord,
                           const BoardState& boardBefore, BoardState& boardAfter);

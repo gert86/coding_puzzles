@@ -3,13 +3,12 @@
 
 #include "base_header.h"
 
-enum FieldState
-{
-  Free = 0,
-  Occupied,
-  Unavailable
-};
-using BoardState = std::vector<std::vector<FieldState>>;
+
+constexpr char FIELD_EMPTY_ID = ' ';
+constexpr char FIELD_UNAVAILABLE_ID = '.';
+
+
+using BoardState = std::vector<std::vector<char>>;
 
 struct Coord
 {

@@ -1,45 +1,5 @@
 #include "Game.h"
 
-void Game::showPrompt() const
-{
-  cout << "Enter a command: " << endl;
-  cout << "h ... show this help text" << endl;
-  cout << "d ... draw board" << endl;
-  cout << "r ... reset board to empty" << endl;
-  cout << "s ... show all pieces (in base configuration)" << endl;
-  cout << "s <piece_id> ... show details for piece" << endl;
-  cout << "p <piece_id> <config_id> <x> <y> ... place a piece" << endl;
-  cout << "x <piece_id> ... unplace a piece" << endl;
-  cout << "f ... find a placment for all unplaced pieces" << endl;
-  cout << "q...quit" << endl;
-}
-
-bool Game::parsePieceId(const string &inputStr, char &pieceId)
-{
-  istringstream ss(inputStr);
-  bool success = false;
-  if(ss >> pieceId) {
-    //cout << "Parsed: pieceId=" << pieceId << endl;
-    success = true;
-  }
-  return (success==true && pieceId!=' ');
-}
-
-bool Game::parseIdsAndCoordinate(const string &inputStr, char &pieceId, int &configId, Coord &coord)
-{
-  istringstream ss(inputStr);
-  bool success = false;
-  if(ss >> pieceId >> configId >> coord.x >> coord.y) {
-    success = true;
-    //cout << "Parsed: pieceId=" << pieceId
-    //     << "; configId=" << configId
-    //     << "; xBoard=" << coord.x
-    //     << "; yBoard=" << coord.y << endl;
-  }
-
-  return (success==true && pieceId!=' ' && configId!=-1 && coord.x!=-1 && coord.y!=-1);
-}
-
 void Game::init()
 {
   _board = new Board();
@@ -178,4 +138,44 @@ int Game::mainLoop()
   }
 
   return -1;
+}
+
+void Game::showPrompt() const
+{
+  cout << "Enter a command: " << endl;
+  cout << "h ... show this help text" << endl;
+  cout << "d ... draw board" << endl;
+  cout << "r ... reset board to empty" << endl;
+  cout << "s ... show all pieces (in base configuration)" << endl;
+  cout << "s <piece_id> ... show details for piece" << endl;
+  cout << "p <piece_id> <config_id> <x> <y> ... place a piece" << endl;
+  cout << "x <piece_id> ... unplace a piece" << endl;
+  cout << "f ... find a placment for all unplaced pieces" << endl;
+  cout << "q...quit" << endl;
+}
+
+bool Game::parsePieceId(const string &inputStr, char &pieceId)
+{
+  istringstream ss(inputStr);
+  bool success = false;
+  if(ss >> pieceId) {
+    //cout << "Parsed: pieceId=" << pieceId << endl;
+    success = true;
+  }
+  return (success==true && pieceId!=' ');
+}
+
+bool Game::parseIdsAndCoordinate(const string &inputStr, char &pieceId, int &configId, Coord &coord)
+{
+  istringstream ss(inputStr);
+  bool success = false;
+  if(ss >> pieceId >> configId >> coord.x >> coord.y) {
+    success = true;
+    //cout << "Parsed: pieceId=" << pieceId
+    //     << "; configId=" << configId
+    //     << "; xBoard=" << coord.x
+    //     << "; yBoard=" << coord.y << endl;
+  }
+
+  return (success==true && pieceId!=' ' && configId!=-1 && coord.x!=-1 && coord.y!=-1);
 }

@@ -13,7 +13,6 @@ private:
 
   // adds up to 7 additional geometries through rotation and mirroring
   void obtainGeometriesFromBase();
-
   void obtainPlaceableOptions(const BoardState& boardState);
 
 private:
@@ -26,6 +25,9 @@ protected:
 protected:
   char _id;
   Geometry _baseGeometry;
+
+public:
+  static std::vector<BoardPlacementEntry> determinePlaceableOptions(const BoardState& boardState, Piece* piece);
 
 public:
   // TODO: make sure this is called from all derived ones before usage
@@ -48,11 +50,74 @@ public:
   size_t getExtent() const;
 };
 
+class PieceA : public Piece
+{
+public:
+  PieceA();
+private:
+  void init() override;
+};
+
+class PieceB : public Piece
+{
+public:
+  PieceB();
+private:
+  void init() override;
+};
+
 class PieceC : public Piece
 {
 public:
   PieceC();
+private:
+  void init() override;
+};
 
+class PieceD : public Piece
+{
+public:
+  PieceD();
+private:
+  void init() override;
+};
+
+class PieceE : public Piece
+{
+public:
+  PieceE();
+private:
+  void init() override;
+};
+
+class PieceF : public Piece
+{
+public:
+  PieceF();
+private:
+  void init() override;
+};
+
+class PieceG : public Piece
+{
+public:
+  PieceG();
+private:
+  void init() override;
+};
+
+class PieceH : public Piece
+{
+public:
+  PieceH();
+private:
+  void init() override;
+};
+
+class PieceI : public Piece
+{
+public:
+  PieceI();
 private:
   void init() override;
 };
@@ -61,11 +126,25 @@ class PieceJ : public Piece
 {
 public:
   PieceJ();
-
 private:
   void init() override;
 };
 
+class PieceK : public Piece
+{
+public:
+  PieceK();
+private:
+  void init() override;
+};
+
+class PieceL : public Piece
+{
+public:
+  PieceL();
+private:
+  void init() override;
+};
 
 
 #endif // PIECE_H
