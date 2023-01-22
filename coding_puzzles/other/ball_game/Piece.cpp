@@ -5,17 +5,23 @@ std::vector<BoardPlacementEntry> Piece::determinePlaceableOptions(const BoardSta
 {
   std::vector<BoardPlacementEntry> options;
   BoardState dummy;
-  for(size_t c=0; c < piece->getNumOrientations(); c++) {
+  for(size_t o=0; o < piece->getNumOrientations(); o++) {
     for(size_t y=0; y < boardState.size(); y++) {
       for(size_t x=0; x < boardState[0].size(); x++) {
         Coord coord(x, y);
-        if (Board::isPlaceable(piece, c, coord, boardState, dummy)) {
-          options.emplace_back(c, coord);
+        if (Board::isPlaceable(piece, o, coord, boardState, dummy)) {
+          options.emplace_back(o, coord);
         }
       }
     }
   }
   return options;
+}
+
+Piece::Piece(char id, Geometry baseGeometry) :
+  _id(id),
+  _baseGeometry(baseGeometry)
+{
 }
 
 void Piece::postInit(const BoardState &boardState)
@@ -180,78 +186,4 @@ void Piece::obtainPlaceableOptions(const BoardState &boardState)
 {
   _placableOptions = determinePlaceableOptions(boardState, this);
   //cout << "Piece " << _id << " has " << getPlaceableOptions().size() << " placeable options on the board" << endl;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void PieceA::init()
-{
-  _id = 'A';
-  _baseGeometry = {{1,0}, {1,1}, {1,2}, {0,2}};
-}
-
-void PieceB::init()
-{
-  _id = 'B';
-  _baseGeometry = {{1,0}, {0,1}, {1,1}, {0,2}, {1,2}};
-}
-
-void PieceC::init()
-{
-  _id = 'C';
-  _baseGeometry = {{1,0}, {1,1}, {1,2}, {1,3}, {0,3}};
-}
-
-void PieceD::init()
-{
-  _id = 'D';
-  _baseGeometry = {{1,0}, {1,1}, {1,2}, {1,3}, {0,2}};
-}
-
-void PieceE::init()
-{
-  _id = 'E';
-  _baseGeometry = {{1,0}, {1,1}, {1,2}, {0,2}, {0,3}};
-}
-
-void PieceF::init()
-{
-  _id = 'F';
-  _baseGeometry = {{1,0}, {1,1}, {0,1}};
-}
-
-void PieceG::init()
-{
-  _id = 'G';
-  _baseGeometry = {{2,0}, {2,1}, {2,2}, {1,2}, {0,2}};
-}
-
-void PieceH::init()
-{
-  _id = 'H';
-  _baseGeometry = {{2,0}, {2,1}, {1,1}, {1,2}, {0,2}};
-}
-
-void PieceI::init()
-{
-  _id = 'I';
-  _baseGeometry = {{0,0}, {0,1}, {1,1}, {2,1}, {2,0}};
-}
-
-void PieceJ::init()
-{
-  _id = 'J';
-  _baseGeometry = {{0,0}, {0,1}, {0,2}, {0,3}};
-}
-
-void PieceK::init()
-{
-  _id = 'K';
-  _baseGeometry = {{0,0}, {0,1}, {1,1}, {1,0}};
-}
-
-void PieceL::init()
-{
-  _id = 'L';
-  _baseGeometry = {{1,0}, {0,1}, {1,1}, {2,1}, {1,2}};
 }

@@ -71,54 +71,21 @@ void Board::initPieces()
 {
   _currPlacedPieces.clear();
   _currUnplacedPieces.clear();
-
-  auto a = new PieceA();
-  a->postInit(_fields);
-  _currUnplacedPieces.push_back(a);
-
-  auto b = new PieceB();
-  b->postInit(_fields);
-  _currUnplacedPieces.push_back(b);
-
-  auto c = new PieceC();
-  c->postInit(_fields);
-  _currUnplacedPieces.push_back(c);
-
-  auto d = new PieceD();
-  d->postInit(_fields);
-  _currUnplacedPieces.push_back(d);
-
-  auto e = new PieceE();
-  e->postInit(_fields);
-  _currUnplacedPieces.push_back(e);
-
-  auto f = new PieceF();
-  f->postInit(_fields);
-  _currUnplacedPieces.push_back(f);
-
-  auto g = new PieceG();
-  g->postInit(_fields);
-  _currUnplacedPieces.push_back(g);
-
-  auto h = new PieceH();
-  h->postInit(_fields);
-  _currUnplacedPieces.push_back(h);
-
-  auto i = new PieceI();
-  i->postInit(_fields);
-  _currUnplacedPieces.push_back(i);
-
-  auto j = new PieceJ();
-  j->postInit(_fields);
-  _currUnplacedPieces.push_back(j);
-
-  auto k = new PieceK();
-  k->postInit(_fields);
-  _currUnplacedPieces.push_back(k);
-
-  auto l = new PieceL();
-  l->postInit(_fields);
-  _currUnplacedPieces.push_back(l);
+  _currUnplacedPieces.push_back(new Piece('A', {{1,0}, {1,1}, {1,2}, {0,2}}));
+  _currUnplacedPieces.push_back(new Piece('B', {{1,0}, {0,1}, {1,1}, {0,2}, {1,2}}));
+  _currUnplacedPieces.push_back(new Piece('C', {{1,0}, {1,1}, {1,2}, {1,3}, {0,3}}));
+  _currUnplacedPieces.push_back(new Piece('D', {{1,0}, {1,1}, {1,2}, {1,3}, {0,2}}));
+  _currUnplacedPieces.push_back(new Piece('E', {{1,0}, {1,1}, {1,2}, {0,2}, {0,3}}));
+  _currUnplacedPieces.push_back(new Piece('F', {{1,0}, {1,1}, {0,1}}));
+  _currUnplacedPieces.push_back(new Piece('G', {{2,0}, {2,1}, {2,2}, {1,2}, {0,2}}));
+  _currUnplacedPieces.push_back(new Piece('H', {{2,0}, {2,1}, {1,1}, {1,2}, {0,2}}));
+  _currUnplacedPieces.push_back(new Piece('I', {{0,0}, {0,1}, {1,1}, {2,1}, {2,0}}));
+  _currUnplacedPieces.push_back(new Piece('J', {{0,0}, {0,1}, {0,2}, {0,3}}));
+  _currUnplacedPieces.push_back(new Piece('K', {{0,0}, {0,1}, {1,1}, {1,0}}));
+  _currUnplacedPieces.push_back(new Piece('L', {{1,0}, {0,1}, {1,1}, {2,1}, {1,2}}));
+  for (auto p : _currUnplacedPieces) {
+    p->postInit(_fields);
+  }
 }
 
 const std::map<Piece*, BoardPlacementEntry>& Board::getPlacedPieces() const
