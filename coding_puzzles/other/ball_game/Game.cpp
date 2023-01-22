@@ -52,11 +52,11 @@ int Game::mainLoop()
     else if (input.size() > 2 && input.substr(0, 2) == "p ") {
       // PLACE 1 PIECE
       char pieceId = ' ';
-      int configId = -1;
+      int orientationId = -1;
       Coord coordToPlace(-1, -1);
-      bool success = parseIdsAndCoordinate(input.substr(2), pieceId, configId, coordToPlace);
+      bool success = parseIdsAndCoordinate(input.substr(2), pieceId, orientationId, coordToPlace);
       if (!success) {
-        cerr << "Error: Usage is: " << endl << "p <piece_id> <config_id> <x> <y>" << endl;
+        cerr << "Error: Usage is: " << endl << "p <piece_id> <orientation_id> <x> <y>" << endl;
         continue;
       }
 
@@ -74,20 +74,20 @@ int Game::mainLoop()
         continue;
       }
 
-      // check if piece has allows this configuration
-      if (configId >= (int)piece->getNumGeometries()) {
-        cerr << "Error: The piece with id " << pieceId << " has only " << piece->getNumGeometries()
-             << " configurations, but index " << configId << " was requested!" << endl;
+      // check if piece has allows this orientation
+      if (orientationId >= (int)piece->getNumOrientations()) {
+        cerr << "Error: The piece with id " << pieceId << " has only " << piece->getNumOrientations()
+             << " orientations, but index " << orientationId << " was requested!" << endl;
         continue;
       }
 
       // try to place it there
-      auto result = _board->tryPlacePiece(piece, configId, coordToPlace);
+      auto result = _board->tryPlacePiece(piece, orientationId, coordToPlace);
       if (result) {
-        cout << "Success -> placed " << pieceId << "@" << configId << " at pos" << coordToPlace.x << "/" << coordToPlace.y << endl;
+        cout << "Success -> placed " << pieceId << "@" << orientationId << " at pos" << coordToPlace.x << "/" << coordToPlace.y << endl;
       }
       else {
-        cerr << "Error -> unable to place " << pieceId << "@" << configId << " at pos" << coordToPlace.x << "/" << coordToPlace.y << endl;
+        cerr << "Error -> unable to place " << pieceId << "@" << orientationId << " at pos" << coordToPlace.x << "/" << coordToPlace.y << endl;
       }
     }
     else if (input.size() > 2 && input.substr(0, 2) == "x ") {
@@ -143,9 +143,9 @@ void Game::showPrompt() const
   cout << "h ... show this help text" << endl;
   cout << "d ... draw board" << endl;
   cout << "r ... reset board to empty" << endl;
-  cout << "s ... show all pieces (in base configuration)" << endl;
+  cout << "s ... show all pieces (in base orientation)" << endl;
   cout << "s <piece_id> ... show details for piece" << endl;
-  cout << "p <piece_id> <config_id> <x> <y> ... place a piece" << endl;
+  cout << "p <piece_id> <orientationId_id> <x> <y> ... place a piece" << endl;
   cout << "x <piece_id> ... remove a piece" << endl;
   cout << "f ... find a placement for all unplaced pieces" << endl;
   cout << "q...quit" << endl;
@@ -162,16 +162,16 @@ bool Game::parsePieceId(const string &inputStr, char &pieceId)
   return (success==true && pieceId!=' ');
 }
 
-bool Game::parseIdsAndCoordinate(const string &inputStr, char &pieceId, int &configId, Coord &coord)
+bool Game::parseIdsAndCoordinate(const string &inputStr, char &pieceId, int &orientationId, Coord &coord)
 {
   istringstream ss(inputStr);
   bool success = false;
-  if(ss >> pieceId >> configId >> coord.x >> coord.y) {
+  if(ss >> pieceId >> orientationId >> coord.x >> coord.y) {
     success = true;
     //cout << "Parsed: pieceId=" << pieceId
-    //     << "; configId=" << configId
+    //     << "; orientationId=" << orientationId
     //     << "; xBoard=" << coord.x
     //     << "; yBoard=" << coord.y << endl;
   }
-  return (success==true && pieceId!=' ' && configId!=-1 && coord.x!=-1 && coord.y!=-1);
+  return (success==true && pieceId!=' ' && orientationId!=-1 && coord.x!=-1 && coord.y!=-1);
 }

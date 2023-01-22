@@ -1,11 +1,11 @@
 #include "Board.h"
 #include "Piece.h"
 
-bool Board::isPlaceable(Piece *piece, int configuration, const Coord &coord, const BoardState &boardBefore, BoardState &boardAfter)
+bool Board::isPlaceable(Piece *piece, int orientation, const Coord &coord, const BoardState &boardBefore, BoardState &boardAfter)
 {
   auto boardDirty = boardBefore;
 
-  auto geometry = piece->getGeometryConfigs()[configuration];
+  auto geometry = piece->getGeometryOrientations()[orientation];
   for (const auto& localCoord : geometry) {
     auto x = localCoord.x + coord.x;
     auto y = localCoord.y + coord.y;
@@ -170,8 +170,8 @@ void Board::showAllPieces() const
   cout << "----------------------------------------" << endl;
   size_t sumUnplacedExtents = 0;
   for (const auto& p : _currUnplacedPieces) {
-    cout << p->id() << ": Supports " << p->getNumGeometries() << " configurations" << endl;
-    p->drawBaseConfiguration();
+    cout << p->id() << ": Supports " << p->getNumOrientations() << " orientations" << endl;
+    p->drawBaseorientation();
     sumUnplacedExtents += p->getExtent();
   }
 
@@ -179,9 +179,9 @@ void Board::showAllPieces() const
   cout << "----------------------------------------" << endl;
   size_t sumPlacedExtents = 0;
   for (const auto& [p, placement] : _currPlacedPieces) {
-    cout << p->id() << ": Placed in configuration " << placement._configurationIdx
+    cout << p->id() << ": Placed in orientation " << placement._orientationIdx
          << " at position " << placement._topLeftOnBoard.x << "," << placement._topLeftOnBoard.y << endl;
-    p->drawBaseConfiguration();
+    p->drawBaseorientation();
     sumPlacedExtents += p->getExtent();
   }
 
@@ -200,7 +200,7 @@ void Board::showPieceDetails(char pieceId) const
 {
   Piece* piece = nullptr;
   bool placed = false;
-  int placedConfiguration = -1;
+  int placedorientation = -1;
   Coord placedPos;
 
   // check if placed
@@ -208,7 +208,7 @@ void Board::showPieceDetails(char pieceId) const
     if (p->id() == pieceId) {
       piece = p;
       placed = true;
-      placedConfiguration = placement._configurationIdx;
+      placedorientation = placement._orientationIdx;
       placedPos = placement._topLeftOnBoard;
       break;
     }
@@ -231,25 +231,25 @@ void Board::showPieceDetails(char pieceId) const
   }
 
   cout << piece->id() << " is currently";
-  if (placed) cout << " placed in configuration " << placedConfiguration << " at position " << placedPos.x << "," << placedPos.y;
+  if (placed) cout << " placed in orientation " << placedorientation << " at position " << placedPos.x << "," << placedPos.y;
   else        cout << " unplaced";
-  cout << " and supports " << piece->getNumGeometries() << " configurations..." << endl;
-  piece->drawAllConfigurations();
+  cout << " and supports " << piece->getNumOrientations() << " orientations..." << endl;
+  piece->drawAllorientations();
 }
 
-bool Board::tryPlacePiece(Piece *piece, int configuration, const Coord &coord)
+bool Board::tryPlacePiece(Piece *piece, int orientation, const Coord &coord)
 {
-  // note: it was already checked that there exists an unplaced piece that provides this configuration
+  // note: it was already checked that there exists an unplaced piece that provides this orientation
   assert(piece && piece->id() != ' ');
 
   // adapt field states
-  if (!isPlaceable(piece, configuration, coord, _fields, _fields))
+  if (!isPlaceable(piece, orientation, coord, _fields, _fields))
     return false;
 
   // transition from unplaced(free) to placed(occupied)
   _currUnplacedPieces.erase(std::find(_currUnplacedPieces.begin(), _currUnplacedPieces.end(), piece));
   _numFreeFields -= piece->getExtent();
-  _currPlacedPieces[piece] = BoardPlacementEntry(configuration, coord);
+  _currPlacedPieces[piece] = BoardPlacementEntry(orientation, coord);
   _numOccupiedFields += piece->getExtent();
   return true;
 }
@@ -265,7 +265,7 @@ bool Board::removePlacedPiece(Piece *piece)
   auto placement = _currPlacedPieces[piece];
 
   // adapt field states
-  auto geometry = piece->getGeometryConfigs()[placement._configurationIdx];
+  auto geometry = piece->getGeometryOrientations()[placement._orientationIdx];
   for (const auto& localCoord : geometry) {
     auto x = localCoord.x + placement._topLeftOnBoard.x;
     auto y = localCoord.y + placement._topLeftOnBoard.y;
@@ -344,9 +344,9 @@ bool Board::solveRecursive(std::map<Piece*, std::vector<BoardPlacementEntry>> &r
   remainingPlacements[currPiece].pop_back();
 
   // does it work?
-  if (!tryPlacePiece(currPiece, nextPlacementForPiece._configurationIdx, nextPlacementForPiece._topLeftOnBoard)) {
+  if (!tryPlacePiece(currPiece, nextPlacementForPiece._orientationIdx, nextPlacementForPiece._topLeftOnBoard)) {
     // placement does not work in this step, maybe with the next placement...
-//    cout << spaceStr() << "#### 3. placement option for "  << currPiece->id() << "@" << nextPlacementForPiece._geometryIndex
+//    cout << spaceStr() << "#### 3. placement option for "  << currPiece->id() << "@" << nextPlacementForPiece._orientationIndex
 //         << " at " << nextPlacementForPiece._coordOnBoard.x << "/" << nextPlacementForPiece._coordOnBoard.y
 //         << " NOT POSSIBLE. Recurse with " << remainingPlacements[currPiece].size()
 //         << " alternative placements left..." << endl;
@@ -354,7 +354,7 @@ bool Board::solveRecursive(std::map<Piece*, std::vector<BoardPlacementEntry>> &r
   }
 
   // piece was placed successfully (was therefore removed from _currUnplacedPieces in tryPlacePiece already)
-//  cout << spaceStr() << "#### 4. placement option for " << currPiece->id() << "@" << nextPlacementForPiece._geometryIndex
+//  cout << spaceStr() << "#### 4. placement option for " << currPiece->id() << "@" << nextPlacementForPiece._orientationIndex
 //       << " at " << nextPlacementForPiece._coordOnBoard.x << "/" << nextPlacementForPiece._coordOnBoard.y
 //       << " POSSIBLE. Remaining unplaced pieces: " << _currUnplacedPieces.size() << endl;
 
@@ -371,7 +371,7 @@ bool Board::solveRecursive(std::map<Piece*, std::vector<BoardPlacementEntry>> &r
       remainingPlacements[unplaced] = Piece::determinePlaceableOptions(_fields, unplaced);
     }
   }
-//  cout << spaceStr() << "#### 6. Dammit, placing " << currPiece->id() << "@" << nextPlacementForPiece._geometryIndex
+//  cout << spaceStr() << "#### 6. Dammit, placing " << currPiece->id() << "@" << nextPlacementForPiece._orientationIndex
 //       << " at " << nextPlacementForPiece._coordOnBoard.x << "/" << nextPlacementForPiece._coordOnBoard.y
 //       << " was a DEAD END. Re-added it and recurse with " << remainingPlacements[currPiece].size()
 //       << " options. Remaining unplaced pieces: " << _currUnplacedPieces.size() << endl;

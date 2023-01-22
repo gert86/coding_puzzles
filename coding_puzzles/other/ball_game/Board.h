@@ -8,7 +8,7 @@ class Piece;
 class Board
 {
 public:
-  static bool isPlaceable(Piece* piece, int configuration, const Coord& coord,
+  static bool isPlaceable(Piece* piece, int orientation, const Coord& coord,
                           const BoardState& boardBefore, BoardState& boardAfter);
 public:
   Board();
@@ -22,7 +22,7 @@ public:
   void showAllPieces() const;
   void showPieceDetails(char pieceId) const;
 
-  bool tryPlacePiece(Piece* piece, int configuration, const Coord& coord);
+  bool tryPlacePiece(Piece* piece, int orientation, const Coord& coord);
   bool removePlacedPiece(Piece* piece);
   bool solveGame();
 

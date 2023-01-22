@@ -15,7 +15,7 @@ private:
   void showPrompt() const;
   bool parsePieceId(const std::string& inputStr, char& pieceId);
   bool parseIdsAndCoordinate(const std::string& inputStr,
-                             char& pieceId, int& configId, Coord& coord);
+                             char& pieceId, int& orientationId, Coord& coord);
 
 private:
   Board* _board;

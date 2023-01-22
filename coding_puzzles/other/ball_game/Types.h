@@ -31,12 +31,12 @@ static bool operator==(const Coord& lhs, const Coord& rhs)
 
 struct BoardPlacementEntry
 {
-  int _configurationIdx{-1};
+  int _orientationIdx{-1};
   Coord _topLeftOnBoard{-1,-1};
 
   BoardPlacementEntry() = default;
   BoardPlacementEntry(int g, const Coord& c) :
-    _configurationIdx(g),
+    _orientationIdx(g),
     _topLeftOnBoard(Coord(c.x, c.y))
   {}
 };

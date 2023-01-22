@@ -5,7 +5,7 @@ std::vector<BoardPlacementEntry> Piece::determinePlaceableOptions(const BoardSta
 {
   std::vector<BoardPlacementEntry> options;
   BoardState dummy;
-  for(size_t c=0; c < piece->getNumGeometries(); c++) {
+  for(size_t c=0; c < piece->getNumOrientations(); c++) {
     for(size_t y=0; y < boardState.size(); y++) {
       for(size_t x=0; x < boardState[0].size(); x++) {
         Coord coord(x, y);
@@ -20,33 +20,33 @@ std::vector<BoardPlacementEntry> Piece::determinePlaceableOptions(const BoardSta
 
 void Piece::postInit(const BoardState &boardState)
 {
-  obtainGeometriesFromBase();
+  obtainOrientationsFromBase();
   obtainPlaceableOptions(boardState);
 }
 
-void Piece::drawBaseConfiguration() const
+void Piece::drawBaseorientation() const
 {
   Piece::drawGeometry(_baseGeometry);
   cout << endl;
 }
 
-void Piece::drawAllConfigurations() const
+void Piece::drawAllorientations() const
 {
-  for (size_t i=0; i<_geometryConfigurations.size(); i++) {
-    cout << "Configuration " << i << ": " << endl;
-    Piece::drawGeometry(_geometryConfigurations[i]);
+  for (size_t i=0; i<_geometryOrientations.size(); i++) {
+    cout << "orientation " << i << ": " << endl;
+    Piece::drawGeometry(_geometryOrientations[i]);
     cout << endl;
   }
 }
 
-const Geometries& Piece::getGeometryConfigs() const
+const Geometries& Piece::getGeometryOrientations() const
 {
-  return _geometryConfigurations;
+  return _geometryOrientations;
 }
 
-size_t Piece::getNumGeometries() const
+size_t Piece::getNumOrientations() const
 {
-  return _geometryConfigurations.size();
+  return _geometryOrientations.size();
 }
 
 const std::vector<BoardPlacementEntry>& Piece::getPlaceableOptions() const
@@ -143,22 +143,22 @@ Geometry Piece::transformGeometry(const Geometry &geometry, GeometryModification
   return transformed;
 }
 
-void Piece::obtainGeometriesFromBase()
+void Piece::obtainOrientationsFromBase()
 {
   using SortedGeometry = std::set<Coord>;
 
-  std::set<SortedGeometry> knownConfigurationsSorted;
-  _geometryConfigurations.clear();
+  std::set<SortedGeometry> knownorientationsSorted;
+  _geometryOrientations.clear();
 
   // insert base
   SortedGeometry baseSorted;
   for (const auto &entry : _baseGeometry) {
     baseSorted.insert(entry);
   }
-  knownConfigurationsSorted.insert(baseSorted);
-  _geometryConfigurations.push_back(_baseGeometry);
+  knownorientationsSorted.insert(baseSorted);
+  _geometryOrientations.push_back(_baseGeometry);
 
-  // check other possible configuration (avoid duplicates)
+  // check other possible orientation (avoid duplicates)
   for (const auto& t : {GeometryModification::Rotated90, GeometryModification::Rotated180, GeometryModification::Rotated270,
        GeometryModification::Mirrored, GeometryModification::MirroredRotated90,
        GeometryModification::MirroredRotated180, GeometryModification::MirroredRotated270})
@@ -168,12 +168,12 @@ void Piece::obtainGeometriesFromBase()
     for (const auto &entry : transformed) {
       transformedSorted.insert(entry);
     }
-    if (knownConfigurationsSorted.find(transformedSorted) == knownConfigurationsSorted.end()) {
-      knownConfigurationsSorted.insert(transformedSorted);
-      _geometryConfigurations.push_back(transformed);
+    if (knownorientationsSorted.find(transformedSorted) == knownorientationsSorted.end()) {
+      knownorientationsSorted.insert(transformedSorted);
+      _geometryOrientations.push_back(transformed);
     }
   }
-  //cout << "Piece " << _id << " has " << getNumGeometries() << " configurations" << endl;
+  //cout << "Piece " << _id << " has " << getNumGeometries() << " orientations" << endl;
 }
 
 void Piece::obtainPlaceableOptions(const BoardState &boardState)

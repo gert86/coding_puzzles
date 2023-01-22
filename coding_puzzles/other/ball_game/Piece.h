@@ -10,10 +10,10 @@ public:
 
 public:
   void postInit(const BoardState& boardState);  // TODO: make sure this is called from all derived instances before usage
-  void drawBaseConfiguration() const;
-  void drawAllConfigurations() const;
-  const Geometries& getGeometryConfigs() const;
-  size_t getNumGeometries() const;
+  void drawBaseorientation() const;
+  void drawAllorientations() const;
+  const Geometries& getGeometryOrientations() const;
+  size_t getNumOrientations() const;
   const std::vector<BoardPlacementEntry>& getPlaceableOptions() const;
   size_t getNumPlaceableOptions() const;
   char id() const;
@@ -33,11 +33,11 @@ private:
 
 private:
   //! adds up to 7 additional geometries through rotation and mirroring
-  void obtainGeometriesFromBase();
+  void obtainOrientationsFromBase();
   void obtainPlaceableOptions(const BoardState& boardState);
 
 private:
-  Geometries _geometryConfigurations;
+  Geometries _geometryOrientations;
   std::vector<BoardPlacementEntry> _placableOptions;
 };
 
