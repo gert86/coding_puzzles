@@ -38,6 +38,10 @@ private:
 
   std::map<Piece*, BoardPlacementEntry> _currPlacedPieces;
   std::vector<Piece*> _currUnplacedPieces;
+
+  // only for statistics
+  mutable long long _remainingBruteForceOptions{0};
+  mutable long long _numRecursiveCalls{0};
 };
 
 

@@ -300,34 +300,29 @@ bool Board::solveGame()
     return true;
   }
 
-  // print statistics and update remainig possibilities
+  // print pre-statistics and update remainig possibilities
   auto remainingPossibilities = getAndPrintRemainingPlacementOptions();
+  _numRecursiveCalls = 0;
 
   // restore original state if solving was not successful
   auto startTime = std::chrono::steady_clock::now();
-  cout << "Searching for a solution..." << endl;
   Board backup(*this);
   if (solveRecursive(remainingPossibilities) == false) {
     *this = backup;
+    cerr << "Error -> could not solve the board after " << _numRecursiveCalls << " of " << _remainingBruteForceOptions << " recursive steps" << endl;
     return false;
   }
 
+  // print post-statistics
   std::chrono::duration<double> diff = std::chrono::steady_clock::now() - startTime;
-  cout << "solving took " << diff.count() << " seconds" << endl;
+  cout << "Success -> solved the board after " << _numRecursiveCalls << " of " << _remainingBruteForceOptions+1 << " recursive steps" << endl;
+  cout << "Solving took " << diff.count() << " seconds (" << std::chrono::duration_cast<std::chrono::nanoseconds>(diff).count()/(_numRecursiveCalls+1) << "ns/recursion)" << endl;
   return true;
 }
 
 bool Board::solveRecursive(std::map<Piece*, std::vector<BoardPlacementEntry>> &remainingPlacements)
 {
-//  size_t atBegin = _currUnplacedPieces.size();
-//  auto spaceStr = [atBegin]()
-//  {
-//    std::stringstream ss;
-//    for (size_t i=0; i < atBegin; i++)
-//      ss << " ";
-//    return ss.str();
-//  };
-
+  _numRecursiveCalls++;
 
   // ends the recursion
   if (_currUnplacedPieces.empty()) {
@@ -398,5 +393,6 @@ std::map<Piece*, std::vector<BoardPlacementEntry>> Board::getAndPrintRemainingPl
          << remainingOptionsForPiece.size() << " remain with current board" << endl;
   }
   cout << "Brute-force: " << numPossibilitiesBruteForce << ", Current board: " << numPossibilitiesCurrentBoard << endl;
+  _remainingBruteForceOptions = numPossibilitiesCurrentBoard;
   return remainingOptions;
 }

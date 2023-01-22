@@ -122,13 +122,7 @@ int Game::mainLoop()
     }
     else if (input == "f") {
       // FIND A SOLUTION FOR ALL UNPLACED PIECES
-      if (_board->solveGame()) {
-        cout << "Success -> solved the board" << std::endl;
-      }
-      else {
-        cerr << "Error -> could not solve the board" << std::endl;
-      }
-      cout << endl;
+      _board->solveGame();
     }
     else if (input == "q") {
       cout << "Quit!" << endl;
