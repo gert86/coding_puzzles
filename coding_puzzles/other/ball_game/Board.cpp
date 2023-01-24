@@ -221,7 +221,6 @@ bool Board::tryPlacePiece(Piece *piece, int orientation, const Coord &coord)
   return true;
 }
 
-
 bool Board::removePlacedPiece(Piece *piece)
 {
   // note: it was already checked that there exists a placed piece
@@ -276,7 +275,7 @@ bool Board::solveGame()
   Board backup(*this);
   if (solveRecursive(remainingPossibilities) == false) {
     *this = backup;
-    cerr << "Error -> could not solve the board after " << _numRecursiveCalls << " of " << _remainingBruteForceOptions << " recursive steps" << endl;
+    cerr << "Error -> could not solve the board after " << _numRecursiveCalls << " of " << _remainingBruteForceOptions+1 << " recursive steps" << endl;
     return false;
   }
 
@@ -289,20 +288,35 @@ bool Board::solveGame()
 
 bool Board::solveRecursive(std::map<Piece*, std::vector<BoardPlacementEntry>> &remainingPlacements)
 {
+  // include=true means only the given piece, include=false means all except the given  piece
+  auto updateRemainingPlacementFor = [this, &remainingPlacements](Piece* piece)
+  {
+    for (const auto& unplaced : _currUnplacedPieces) {
+      if (piece==unplaced) {
+        remainingPlacements[unplaced] = Piece::determinePlaceableOptions(_fields, unplaced);
+      }
+    }
+  };
+
+  auto updateRemainingPlacementExceptFor = [this, &remainingPlacements](Piece* excludePiece)
+  {
+    for (const auto& unplaced : _currUnplacedPieces) {
+      if (excludePiece!=unplaced) {
+        remainingPlacements[unplaced] = Piece::determinePlaceableOptions(_fields, unplaced);
+      }
+    }
+  };
+
   _numRecursiveCalls++;
 
   // ends the recursion
   if (_currUnplacedPieces.empty()) {
-//    cout << spaceStr() << "#### We are done " << endl;
     return true;
   }
 
   // no more placement options - cannot solve
   auto currPiece = _currUnplacedPieces.back();
-//  cout << spaceStr() << "#### 0. solveBoard called with " << _currUnplacedPieces.size() << " unplaced pieces -> CURR: "
-//       << currPiece->id() << endl;
   if (remainingPlacements[currPiece].empty()) {
-//    cout << spaceStr() << "#### 2. No more placement options for " << currPiece->id() << endl;
     return false;
   }
 
@@ -313,35 +327,22 @@ bool Board::solveRecursive(std::map<Piece*, std::vector<BoardPlacementEntry>> &r
   // does it work?
   if (!tryPlacePiece(currPiece, nextPlacementForPiece._orientationIdx, nextPlacementForPiece._topLeftOnBoard)) {
     // placement does not work in this step, maybe with the next placement...
-//    cout << spaceStr() << "#### 3. placement option for "  << currPiece->id() << "@" << nextPlacementForPiece._orientationIndex
-//         << " at " << nextPlacementForPiece._coordOnBoard.x << "/" << nextPlacementForPiece._coordOnBoard.y
-//         << " NOT POSSIBLE. Recurse with " << remainingPlacements[currPiece].size()
-//         << " alternative placements left..." << endl;
     return solveRecursive(remainingPlacements);
   }
-
-  // piece was placed successfully (was therefore removed from _currUnplacedPieces in tryPlacePiece already)
-//  cout << spaceStr() << "#### 4. placement option for " << currPiece->id() << "@" << nextPlacementForPiece._orientationIndex
-//       << " at " << nextPlacementForPiece._coordOnBoard.x << "/" << nextPlacementForPiece._coordOnBoard.y
-//       << " POSSIBLE. Remaining unplaced pieces: " << _currUnplacedPieces.size() << endl;
+  // piece was placed successfully (was removed from _currUnplacedPieces in tryPlacePiece already)
+  if (!_currUnplacedPieces.empty()) {
+    auto nextToBeProcessed = _currUnplacedPieces.back();
+    updateRemainingPlacementFor(nextToBeProcessed);
+  }
 
   // can it be solved like this?
   if (solveRecursive(remainingPlacements)) {
-//    cout << spaceStr() << "#### 5. Awesome, we are done" << endl;
     return true;
   }
 
   // if not unplace it again (placement was a dead end) and restore placement options of all OTHER yet unplaced
   removePlacedPiece(currPiece);
-  for (const auto& unplaced : _currUnplacedPieces) {
-    if (unplaced != currPiece) {
-      remainingPlacements[unplaced] = Piece::determinePlaceableOptions(_fields, unplaced);
-    }
-  }
-//  cout << spaceStr() << "#### 6. Dammit, placing " << currPiece->id() << "@" << nextPlacementForPiece._orientationIndex
-//       << " at " << nextPlacementForPiece._coordOnBoard.x << "/" << nextPlacementForPiece._coordOnBoard.y
-//       << " was a DEAD END. Re-added it and recurse with " << remainingPlacements[currPiece].size()
-//       << " options. Remaining unplaced pieces: " << _currUnplacedPieces.size() << endl;
+  updateRemainingPlacementExceptFor(currPiece);
 
   return solveRecursive(remainingPlacements);
 }

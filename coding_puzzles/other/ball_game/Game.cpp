@@ -145,7 +145,7 @@ void Game::showPrompt() const
   cout << "r ... reset board to empty" << endl;
   cout << "s ... show all pieces (in base orientation)" << endl;
   cout << "s <piece_id> ... show details for piece" << endl;
-  cout << "p <piece_id> <orientationId_id> <x> <y> ... place a piece" << endl;
+  cout << "p <piece_id> <orientation_id> <x> <y> ... place a piece" << endl;
   cout << "x <piece_id> ... remove a piece" << endl;
   cout << "f ... find a placement for all unplaced pieces" << endl;
   cout << "q...quit" << endl;
