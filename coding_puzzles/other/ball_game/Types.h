@@ -56,4 +56,6 @@ enum GeometryModification
   MirroredRotated270
 };
 
+using BoundingBox = std::pair<Coord, Coord>;
+
 #endif // TYPES_H

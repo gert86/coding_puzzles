@@ -1,7 +1,8 @@
 #include "Board.h"
 #include "Piece.h"
 
-bool Board::isPlaceable(Piece *piece, int orientation, const Coord &coord, const BoardState &boardBefore, BoardState &boardAfter)
+bool Board::isPlaceable(Piece *piece, int orientation, const Coord &coord,
+                        const BoardState &boardBefore, BoardState &boardAfter)
 {
   auto boardDirty = boardBefore;
 
@@ -138,7 +139,7 @@ void Board::showAllPieces() const
   size_t sumUnplacedExtents = 0;
   for (const auto& p : _currUnplacedPieces) {
     cout << p->id() << ": Supports " << p->getNumOrientations() << " orientations" << endl;
-    p->drawBaseorientation();
+    p->drawBaseOrientation();
     sumUnplacedExtents += p->getExtent();
   }
 
@@ -148,7 +149,7 @@ void Board::showAllPieces() const
   for (const auto& [p, placement] : _currPlacedPieces) {
     cout << p->id() << ": Placed in orientation " << placement._orientationIdx
          << " at position " << placement._topLeftOnBoard.x << "," << placement._topLeftOnBoard.y << endl;
-    p->drawBaseorientation();
+    p->drawBaseOrientation();
     sumPlacedExtents += p->getExtent();
   }
 
@@ -201,7 +202,7 @@ void Board::showPieceDetails(char pieceId) const
   if (placed) cout << " placed in orientation " << placedorientation << " at position " << placedPos.x << "," << placedPos.y;
   else        cout << " unplaced";
   cout << " and supports " << piece->getNumOrientations() << " orientations..." << endl;
-  piece->drawAllorientations();
+  piece->drawAllOrientations();
 }
 
 bool Board::tryPlacePiece(Piece *piece, int orientation, const Coord &coord)
@@ -231,11 +232,11 @@ bool Board::removePlacedPiece(Piece *piece)
   auto placement = _currPlacedPieces[piece];
 
   // adapt field states
-  auto geometry = piece->getGeometryOrientations()[placement._orientationIdx];
+  const auto& geometry = piece->getGeometryOrientations()[placement._orientationIdx];
   for (const auto& localCoord : geometry) {
     auto x = localCoord.x + placement._topLeftOnBoard.x;
     auto y = localCoord.y + placement._topLeftOnBoard.y;
-    assert ((int)_fields.size() > y && (int)_fields[y].size() > x && _fields[y][x] != FIELD_EMPTY_ID && _fields[y][x] != FIELD_UNAVAILABLE_ID);
+    //assert ((int)_fields.size() > y && (int)_fields[y].size() > x && _fields[y][x] != FIELD_EMPTY_ID && _fields[y][x] != FIELD_UNAVAILABLE_ID);
     _fields[y][x] = FIELD_EMPTY_ID;
   }
 

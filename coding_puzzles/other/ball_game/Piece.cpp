@@ -4,10 +4,11 @@
 std::vector<BoardPlacementEntry> Piece::determinePlaceableOptions(const BoardState &boardState, Piece *piece)
 {
   std::vector<BoardPlacementEntry> options;
+  auto bbxes = piece->getGeometryOrientationBoundingBoxes();
   BoardState dummy;
-  for(size_t o=0; o < piece->getNumOrientations(); o++) {
-    for(size_t y=0; y < boardState.size(); y++) {
-      for(size_t x=0; x < boardState[0].size(); x++) {
+  for(size_t o=0; o < piece->getNumOrientations(); o++) {    
+    for(size_t y=0; y < boardState.size() - bbxes[o].second.y; y++) {
+      for(size_t x=0; x < boardState[0].size() - bbxes[o].second.x; x++) {
         Coord coord(x, y);
         if (Board::isPlaceable(piece, o, coord, boardState, dummy)) {
           options.emplace_back(o, coord);
@@ -30,13 +31,13 @@ void Piece::postInit(const BoardState &boardState)
   obtainPlaceableOptions(boardState);
 }
 
-void Piece::drawBaseorientation() const
+void Piece::drawBaseOrientation() const
 {
   Piece::drawGeometry(_baseGeometry);
   cout << endl;
 }
 
-void Piece::drawAllorientations() const
+void Piece::drawAllOrientations() const
 {
   for (size_t i=0; i<_geometryOrientations.size(); i++) {
     cout << "orientation " << i << ": " << endl;
@@ -48,6 +49,11 @@ void Piece::drawAllorientations() const
 const Geometries& Piece::getGeometryOrientations() const
 {
   return _geometryOrientations;
+}
+
+const std::vector<BoundingBox> &Piece::getGeometryOrientationBoundingBoxes() const
+{
+  return _geometryOrientationsBoundingBoxes;
 }
 
 size_t Piece::getNumOrientations() const
@@ -151,32 +157,57 @@ Geometry Piece::transformGeometry(const Geometry &geometry, GeometryModification
 
 void Piece::obtainOrientationsFromBase()
 {
+  auto getBBX = [](const Geometry& geometry)
+  {
+    int minX = std::numeric_limits<int>::max();
+    int minY = std::numeric_limits<int>::max();
+    int maxX = std::numeric_limits<int>::min();
+    int maxY = std::numeric_limits<int>::min();
+    for (const auto& entry : geometry) {
+      if (entry.x < minX)
+        minX = entry.x;
+      if (entry.y < minY)
+        minY = entry.y;
+      if (entry.x > maxX)
+        maxX = entry.x;
+      if (entry.y > maxY)
+        maxY = entry.y;
+    }
+    return std::make_pair(Coord(minX, minY), Coord(maxX, maxY));
+  };
   using SortedGeometry = std::set<Coord>;
 
-  std::set<SortedGeometry> knownorientationsSorted;
+  std::set<SortedGeometry> knownOrientationsSorted;
   _geometryOrientations.clear();
+  _geometryOrientationsBoundingBoxes.clear();
 
   // insert base
   SortedGeometry baseSorted;
   for (const auto &entry : _baseGeometry) {
     baseSorted.insert(entry);
   }
-  knownorientationsSorted.insert(baseSorted);
+  knownOrientationsSorted.insert(baseSorted);
   _geometryOrientations.push_back(_baseGeometry);
+  _geometryOrientationsBoundingBoxes.push_back(getBBX(_baseGeometry));
 
   // check other possible orientation (avoid duplicates)
-  for (const auto& t : {GeometryModification::Rotated90, GeometryModification::Rotated180, GeometryModification::Rotated270,
-       GeometryModification::Mirrored, GeometryModification::MirroredRotated90,
-       GeometryModification::MirroredRotated180, GeometryModification::MirroredRotated270})
+  for (const auto& t : {GeometryModification::Rotated90,
+                        GeometryModification::Rotated180,
+                        GeometryModification::Rotated270,
+                        GeometryModification::Mirrored,
+                        GeometryModification::MirroredRotated90,
+                        GeometryModification::MirroredRotated180,
+                        GeometryModification::MirroredRotated270})
   {
     auto transformed = Piece::transformGeometry(_baseGeometry, t);
     SortedGeometry transformedSorted;
     for (const auto &entry : transformed) {
       transformedSorted.insert(entry);
     }
-    if (knownorientationsSorted.find(transformedSorted) == knownorientationsSorted.end()) {
-      knownorientationsSorted.insert(transformedSorted);
+    if (knownOrientationsSorted.find(transformedSorted) == knownOrientationsSorted.end()) {
+      knownOrientationsSorted.insert(transformedSorted);
       _geometryOrientations.push_back(transformed);
+        _geometryOrientationsBoundingBoxes.push_back(getBBX(transformed));
     }
   }
   //cout << "Piece " << _id << " has " << getNumGeometries() << " orientations" << endl;

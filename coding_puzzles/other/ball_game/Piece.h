@@ -11,9 +11,10 @@ public:
 public:
   Piece(char id, Geometry baseGeometry);
   void postInit(const BoardState& boardState);
-  void drawBaseorientation() const;
-  void drawAllorientations() const;
+  void drawBaseOrientation() const;
+  void drawAllOrientations() const;
   const Geometries& getGeometryOrientations() const;
+  const std::vector<BoundingBox>& getGeometryOrientationBoundingBoxes() const;
   size_t getNumOrientations() const;
   const std::vector<BoardPlacementEntry>& getPlaceableOptions() const;
   size_t getNumPlaceableOptions() const;
@@ -35,6 +36,7 @@ private:
 
 private:
   Geometries _geometryOrientations;
+  std::vector<BoundingBox> _geometryOrientationsBoundingBoxes;
   std::vector<BoardPlacementEntry> _placableOptions;
 };
 
