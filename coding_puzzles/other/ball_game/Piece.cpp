@@ -61,14 +61,9 @@ size_t Piece::getNumOrientations() const
   return _geometryOrientations.size();
 }
 
-const std::vector<BoardPlacementEntry>& Piece::getPlaceableOptions() const
+size_t Piece::getNumInitialPlaceableOptions() const
 {
-  return _placableOptions;
-}
-
-size_t Piece::getNumPlaceableOptions() const
-{
-  return _placableOptions.size();
+  return _initialPlacableOptions.size();
 }
 
 char Piece::id() const
@@ -215,6 +210,6 @@ void Piece::obtainOrientationsFromBase()
 
 void Piece::obtainPlaceableOptions(const BoardState &boardState)
 {
-  _placableOptions = determinePlaceableOptions(boardState, this);
+  _initialPlacableOptions = determinePlaceableOptions(boardState, this);
   //cout << "Piece " << _id << " has " << getPlaceableOptions().size() << " placeable options on the board" << endl;
 }

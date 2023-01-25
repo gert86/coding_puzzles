@@ -28,7 +28,7 @@ public:
 
 private:
   bool solveRecursive(std::map<Piece*, std::vector<BoardPlacementEntry>> &remainingPossibilities);
-  std::map<Piece*, std::vector<BoardPlacementEntry>>  getAndPrintRemainingPlacementOptions() const;  // also prints stats
+  std::map<Piece*, std::vector<BoardPlacementEntry>>  getRemainingPlacementOptions(bool print=false) const;
 
 private:
   int _numFreeFields{-1};

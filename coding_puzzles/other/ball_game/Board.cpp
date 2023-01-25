@@ -161,7 +161,7 @@ void Board::showAllPieces() const
     return;
 
   // print statistics
-  getAndPrintRemainingPlacementOptions();
+  getRemainingPlacementOptions(true);
 }
 
 void Board::showPieceDetails(char pieceId) const
@@ -267,8 +267,17 @@ bool Board::solveGame()
     return true;
   }
 
-  // print pre-statistics and update remainig possibilities
-  auto remainingPossibilities = getAndPrintRemainingPlacementOptions();
+
+
+  // sort by num. initial placement options
+  // since we insert and remove from the back, we want it in decreasing order
+  // Note: It makes almost no difference whether we sort by INITIAL or REMAINING placement options (usually same ordering)
+  std::sort(_currUnplacedPieces.begin(), _currUnplacedPieces.end(),
+            [](const Piece* l, const Piece* r) { return l->getNumInitialPlaceableOptions() >= r->getNumInitialPlaceableOptions(); } );  // initial
+            //[remainingPossibilities](Piece* l, Piece* r) { return remainingPossibilities.at(l).size() >= remainingPossibilities.at(r).size(); } );  // remaining
+
+  // print pre-statistics and update remaining possibilities
+  auto remainingPossibilities = getRemainingPlacementOptions(true);
   _numRecursiveCalls = 0;
 
   // restore original state if solving was not successful
@@ -348,20 +357,24 @@ bool Board::solveRecursive(std::map<Piece*, std::vector<BoardPlacementEntry>> &r
   return solveRecursive(remainingPlacements);
 }
 
-std::map<Piece*, std::vector<BoardPlacementEntry>> Board::getAndPrintRemainingPlacementOptions() const
+std::map<Piece*, std::vector<BoardPlacementEntry>> Board::getRemainingPlacementOptions(bool print) const
 {
   std::map<Piece*, std::vector<BoardPlacementEntry>> remainingOptions;
   long long numPossibilitiesBruteForce = 1;
   long long numPossibilitiesCurrentBoard = 1;
   for (const auto& piece : _currUnplacedPieces) {
-    numPossibilitiesBruteForce *= piece->getNumPlaceableOptions();
+    numPossibilitiesBruteForce *= piece->getNumInitialPlaceableOptions();
     auto remainingOptionsForPiece = Piece::determinePlaceableOptions(_fields, piece);
     remainingOptions[piece] = remainingOptionsForPiece;
     numPossibilitiesCurrentBoard *= remainingOptionsForPiece.size();
-    cout << piece->id() << " had " << piece->getNumPlaceableOptions() << " initial placement options, "
-         << remainingOptionsForPiece.size() << " remain with current board" << endl;
+    if (print) {
+      cout << piece->id() << " had " << piece->getNumInitialPlaceableOptions() << " initial placement options, "
+           << remainingOptionsForPiece.size() << " remain with current board" << endl;
+    }
   }
-  cout << "Brute-force: " << numPossibilitiesBruteForce << ", Current board: " << numPossibilitiesCurrentBoard << endl;
+  if (print) {
+    cout << "Brute-force: " << numPossibilitiesBruteForce << ", Current board: " << numPossibilitiesCurrentBoard << endl;
+  }
   _remainingBruteForceOptions = numPossibilitiesCurrentBoard;
   return remainingOptions;
 }

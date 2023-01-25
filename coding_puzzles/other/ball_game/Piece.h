@@ -16,8 +16,7 @@ public:
   const Geometries& getGeometryOrientations() const;
   const std::vector<BoundingBox>& getGeometryOrientationBoundingBoxes() const;
   size_t getNumOrientations() const;
-  const std::vector<BoardPlacementEntry>& getPlaceableOptions() const;
-  size_t getNumPlaceableOptions() const;
+  size_t getNumInitialPlaceableOptions() const;
   char id() const;
   size_t getExtent() const;
 
@@ -37,7 +36,7 @@ private:
 private:
   Geometries _geometryOrientations;
   std::vector<BoundingBox> _geometryOrientationsBoundingBoxes;
-  std::vector<BoardPlacementEntry> _placableOptions;
+  std::vector<BoardPlacementEntry> _initialPlacableOptions;
 };
 
 #endif // PIECE_H
