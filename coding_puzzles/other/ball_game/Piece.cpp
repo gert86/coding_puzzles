@@ -1,7 +1,26 @@
 #include "Piece.h"
 #include "Board.h"
 
-std::vector<BoardPlacementEntry> Piece::determinePlaceableOptions(const BoardState &boardState, Piece *piece)
+// Helper functions
+namespace {
+
+std::vector<Coord> getFieldsWithId(const BoardState &boardState, char id)
+{
+  std::set<Coord> matchingFields;
+  for (size_t r=0; r<boardState.size(); r++) {
+    for (size_t c=0; c<boardState[r].size(); c++) {
+      if (boardState[r][c] == id) {
+        matchingFields.insert(Coord(c,r));
+      }
+    }
+  }
+
+  std::vector<Coord> ret(matchingFields.begin(), matchingFields.end());
+  return ret;
+}
+}
+
+std::vector<BoardPlacementEntry> Piece::determinePlaceableOptions(const BoardState &boardState, const Piece *piece, const std::vector<Piece*>& unplacedPieces)
 {
   std::vector<BoardPlacementEntry> options;
   auto bbxes = piece->getGeometryOrientationBoundingBoxes();
@@ -16,7 +35,62 @@ std::vector<BoardPlacementEntry> Piece::determinePlaceableOptions(const BoardSta
       }
     }
   }
-  return options;
+
+  if (unplacedPieces.empty()) {
+    return options;
+  }
+
+  // further filter the options that lead to dead-ends w.r.t. unplaced pieces
+  std::vector<BoardPlacementEntry> reducedOptions;
+  BoardState boardStatePlusPiece;
+  for (const auto& option : options) {
+
+    // pretend that piece is placed in this option
+    assert(Board::isPlaceable(piece, option._orientationIdx, option._topLeftOnBoard, boardState, boardStatePlusPiece));
+    const auto freeFieldsAfterPiece = getFieldsWithId(boardStatePlusPiece, FIELD_EMPTY_ID);
+    auto notCoverableFields = freeFieldsAfterPiece;  // will get empty for valid options
+    bool optionPossible = true;    
+
+
+    for (const auto& unplacedPiece : unplacedPieces) {
+      if (unplacedPiece == piece)
+        continue;
+
+      // A. check if this placement makes placing any other piece impossible
+      auto remainingOptionsForUnplaced = Piece::determinePlaceableOptions(boardStatePlusPiece, unplacedPiece);
+      if (remainingOptionsForUnplaced.empty()) {
+        optionPossible = false;
+        break;
+      }
+
+      // B. ...or causes any free field to be not coverable
+      if (!notCoverableFields.empty()) {
+        for (const auto& otherOption : remainingOptionsForUnplaced) {
+          BoardState boardStatePlusPiecePlusCurrent;
+          if(Board::isPlaceable(unplacedPiece, otherOption._orientationIdx, otherOption._topLeftOnBoard,
+                                boardStatePlusPiece, boardStatePlusPiecePlusCurrent))
+          {
+            auto freeFieldsAfterPiecePlusCurrent = getFieldsWithId(boardStatePlusPiecePlusCurrent, FIELD_EMPTY_ID);
+            std::vector<Coord> temp;
+            std::set_intersection(notCoverableFields.begin(), notCoverableFields.end(),
+                                  freeFieldsAfterPiecePlusCurrent.begin(), freeFieldsAfterPiecePlusCurrent.end(),
+                                  std::back_inserter(temp));
+            notCoverableFields = temp;
+            if (notCoverableFields.empty())
+              break;
+          }
+        }
+      }
+    }
+
+
+    // valid option
+    if (optionPossible && notCoverableFields.empty())
+      reducedOptions.push_back(option);
+  }
+
+  cout << "Reduced options for " << piece->id() << " from " << options.size() << " to " << reducedOptions.size() << endl;
+  return reducedOptions;
 }
 
 Piece::Piece(char id, Geometry baseGeometry) :
@@ -25,10 +99,10 @@ Piece::Piece(char id, Geometry baseGeometry) :
 {
 }
 
-void Piece::postInit(const BoardState &boardState)
+void Piece::postInit(const BoardState &boardState, const std::vector<Piece*>& unplacedPieces)
 {
   obtainOrientationsFromBase();
-  obtainPlaceableOptions(boardState);
+  obtainPlaceableOptions(boardState, unplacedPieces);
 }
 
 void Piece::drawBaseOrientation() const
@@ -208,8 +282,8 @@ void Piece::obtainOrientationsFromBase()
   //cout << "Piece " << _id << " has " << getNumGeometries() << " orientations" << endl;
 }
 
-void Piece::obtainPlaceableOptions(const BoardState &boardState)
+void Piece::obtainPlaceableOptions(const BoardState &boardState, const std::vector<Piece*>& unplacedPieces)
 {
-  _initialPlacableOptions = determinePlaceableOptions(boardState, this);
-  //cout << "Piece " << _id << " has " << getPlaceableOptions().size() << " placeable options on the board" << endl;
+  _initialPlacableOptions = determinePlaceableOptions(boardState, this, unplacedPieces);
+  cout << "Piece " << _id << " has " << getNumInitialPlaceableOptions() << " placeable options on the board" << endl;
 }

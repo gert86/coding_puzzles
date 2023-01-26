@@ -6,11 +6,12 @@
 class Piece
 {
 public:
-  static std::vector<BoardPlacementEntry> determinePlaceableOptions(const BoardState& boardState, Piece* piece);
+  // Note: Providing unplaced pieces filters out some more options, but is much slower
+  static std::vector<BoardPlacementEntry> determinePlaceableOptions(const BoardState& boardState, const Piece* piece, const std::vector<Piece*>& unplacedPieces = {});
 
 public:
   Piece(char id, Geometry baseGeometry);
-  void postInit(const BoardState& boardState);
+  void postInit(const BoardState& boardState, const std::vector<Piece*>& unplacedPieces);
   void drawBaseOrientation() const;
   void drawAllOrientations() const;
   const Geometries& getGeometryOrientations() const;
@@ -31,7 +32,7 @@ private:
 private:
   //! adds up to 7 additional geometries through rotation and mirroring
   void obtainOrientationsFromBase();
-  void obtainPlaceableOptions(const BoardState& boardState);
+  void obtainPlaceableOptions(const BoardState& boardState, const std::vector<Piece*>& unplacedPieces);
 
 private:
   Geometries _geometryOrientations;

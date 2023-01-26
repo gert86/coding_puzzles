@@ -1,7 +1,7 @@
 #include "Board.h"
 #include "Piece.h"
 
-bool Board::isPlaceable(Piece *piece, int orientation, const Coord &coord,
+bool Board::isPlaceable(const Piece *piece, int orientation, const Coord &coord,
                         const BoardState &boardBefore, BoardState &boardAfter)
 {
   auto boardDirty = boardBefore;
@@ -85,7 +85,11 @@ void Board::initPieces()
   _currUnplacedPieces.push_back(new Piece('K', {{0,0}, {0,1}, {1,1}, {1,0}}));
   _currUnplacedPieces.push_back(new Piece('L', {{1,0}, {0,1}, {1,1}, {2,1}, {1,2}}));
   for (auto p : _currUnplacedPieces) {
-    p->postInit(_fields);
+    p->postInit(_fields, {});
+  }
+  // TODO: This is not nice - but it works
+  for (auto p : _currUnplacedPieces) {
+    p->postInit(_fields, _currUnplacedPieces);
   }
 }
 
@@ -364,7 +368,7 @@ std::map<Piece*, std::vector<BoardPlacementEntry>> Board::getRemainingPlacementO
   long long numPossibilitiesCurrentBoard = 1;
   for (const auto& piece : _currUnplacedPieces) {
     numPossibilitiesBruteForce *= piece->getNumInitialPlaceableOptions();
-    auto remainingOptionsForPiece = Piece::determinePlaceableOptions(_fields, piece);
+    auto remainingOptionsForPiece = Piece::determinePlaceableOptions(_fields, piece, _currUnplacedPieces);
     remainingOptions[piece] = remainingOptionsForPiece;
     numPossibilitiesCurrentBoard *= remainingOptionsForPiece.size();
     if (print) {

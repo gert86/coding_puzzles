@@ -8,7 +8,7 @@ class Piece;
 class Board
 {
 public:
-  static bool isPlaceable(Piece* piece, int orientation, const Coord& coord,
+  static bool isPlaceable(const Piece* piece, int orientation, const Coord& coord,
                           const BoardState& boardBefore, BoardState& boardAfter);
 public:
   Board();
