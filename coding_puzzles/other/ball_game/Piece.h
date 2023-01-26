@@ -6,17 +6,25 @@
 class Piece
 {
 public:
-  // Note: Providing unplaced pieces filters out some more options, but is much slower
-  static std::vector<BoardPlacementEntry> determinePlaceableOptions(const BoardState& boardState, const Piece* piece, const std::vector<Piece*>& unplacedPieces = {});
+  // determine all possible options to place the given piece on the given board
+  static std::vector<BoardPlacementEntry> determinePlaceableOptions(const BoardState& boardState, const Piece* piece, bool constrainToInitialPlaceableOptions);
+
+  // further filter out options that lead to dead-ends w.r.t. yet unplaced pieces -> takes some time
+  static std::vector<BoardPlacementEntry> reducePlaceableOptions(const std::vector<BoardPlacementEntry>& originalPlaceableOptions,
+                                                                 const BoardState& boardState,
+                                                                 const Piece* piece,
+                                                                 const std::vector<Piece*>& unplacedPieces);
 
 public:
   Piece(char id, Geometry baseGeometry);
-  void postInit(const BoardState& boardState, const std::vector<Piece*>& unplacedPieces);
+  void postInit(const BoardState& boardState);
   void drawBaseOrientation() const;
   void drawAllOrientations() const;
   const Geometries& getGeometryOrientations() const;
   const std::vector<BoundingBox>& getGeometryOrientationBoundingBoxes() const;
   size_t getNumOrientations() const;
+  std::vector<BoardPlacementEntry> getInitialPlaceableOptions() const;
+  void setInitialPlaceableOptions(const std::vector<BoardPlacementEntry>& initialOptions);  // only if read from cache
   size_t getNumInitialPlaceableOptions() const;
   char id() const;
   size_t getExtent() const;
@@ -32,7 +40,7 @@ private:
 private:
   //! adds up to 7 additional geometries through rotation and mirroring
   void obtainOrientationsFromBase();
-  void obtainPlaceableOptions(const BoardState& boardState, const std::vector<Piece*>& unplacedPieces);
+  void obtainPlaceableOptions(const BoardState& boardState);
 
 private:
   Geometries _geometryOrientations;

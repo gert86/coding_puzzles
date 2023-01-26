@@ -1,6 +1,10 @@
 #include "Board.h"
 #include "Piece.h"
 
+#include <fstream>
+
+const std::string Board::INIT_OPTIONS_CACHE_FILE = "/tmp/initPlaceableOptionsCache.txt";
+
 bool Board::isPlaceable(const Piece *piece, int orientation, const Coord &coord,
                         const BoardState &boardBefore, BoardState &boardAfter)
 {
@@ -85,12 +89,21 @@ void Board::initPieces()
   _currUnplacedPieces.push_back(new Piece('K', {{0,0}, {0,1}, {1,1}, {1,0}}));
   _currUnplacedPieces.push_back(new Piece('L', {{1,0}, {0,1}, {1,1}, {2,1}, {1,2}}));
   for (auto p : _currUnplacedPieces) {
-    p->postInit(_fields, {});
+    p->postInit(_fields);
   }
-  // TODO: This is not nice - but it works
+
+  // Read from cache file if possible and exit
+  if (readReducedInitOptionsFromCache(_fields, _currUnplacedPieces))
+    return;
+
+  // Need to calculate them, but storing in cache for later
+  cout << endl << "Reducing initially placeable options for " << _currUnplacedPieces.size() << " pieces (this could take a while) ... " << flush;
   for (auto p : _currUnplacedPieces) {
-    p->postInit(_fields, _currUnplacedPieces);
+    auto reducedOptions = Piece::reducePlaceableOptions(p->getInitialPlaceableOptions(), _fields, p, _currUnplacedPieces);
+    p->setInitialPlaceableOptions(reducedOptions);
   }
+  std::cout << "DONE" << endl << endl;
+  writeReducedInitOptionsToCache(_fields, _currUnplacedPieces);
 }
 
 const std::map<Piece*, BoardPlacementEntry>& Board::getPlacedPieces() const
@@ -111,7 +124,7 @@ void Board::draw() const
   }
 
   auto numRows = _fields.size();
-  auto numCols = _fields[0].size();  // TODO: Use max of all inner vectors to support irregular fields
+  auto numCols = _fields[0].size();
 
   // header on x-axis: 0 1 2 3 ...
   cout << "  ";
@@ -165,7 +178,7 @@ void Board::showAllPieces() const
     return;
 
   // print statistics
-  getRemainingPlacementOptions(true);
+  getRemainingPlacementOptions(false, true);
 }
 
 void Board::showPieceDetails(char pieceId) const
@@ -281,7 +294,7 @@ bool Board::solveGame()
             //[remainingPossibilities](Piece* l, Piece* r) { return remainingPossibilities.at(l).size() >= remainingPossibilities.at(r).size(); } );  // remaining
 
   // print pre-statistics and update remaining possibilities
-  auto remainingPossibilities = getRemainingPlacementOptions(true);
+  auto remainingPossibilities = getRemainingPlacementOptions(true, true);
   _numRecursiveCalls = 0;
 
   // restore original state if solving was not successful
@@ -307,7 +320,7 @@ bool Board::solveRecursive(std::map<Piece*, std::vector<BoardPlacementEntry>> &r
   {
     for (const auto& unplaced : _currUnplacedPieces) {
       if (piece==unplaced) {
-        remainingPlacements[unplaced] = Piece::determinePlaceableOptions(_fields, unplaced);
+        remainingPlacements[unplaced] = Piece::determinePlaceableOptions(_fields, unplaced, true);
       }
     }
   };
@@ -316,7 +329,7 @@ bool Board::solveRecursive(std::map<Piece*, std::vector<BoardPlacementEntry>> &r
   {
     for (const auto& unplaced : _currUnplacedPieces) {
       if (excludePiece!=unplaced) {
-        remainingPlacements[unplaced] = Piece::determinePlaceableOptions(_fields, unplaced);
+        remainingPlacements[unplaced] = Piece::determinePlaceableOptions(_fields, unplaced, true);
       }
     }
   };
@@ -361,24 +374,126 @@ bool Board::solveRecursive(std::map<Piece*, std::vector<BoardPlacementEntry>> &r
   return solveRecursive(remainingPlacements);
 }
 
-std::map<Piece*, std::vector<BoardPlacementEntry>> Board::getRemainingPlacementOptions(bool print) const
+std::map<Piece*, std::vector<BoardPlacementEntry>> Board::getRemainingPlacementOptions(bool reduce, bool printLog) const
 {
+  std::string reduceInfo = reduce ? "(reduced)" : "(unreduced)";
   std::map<Piece*, std::vector<BoardPlacementEntry>> remainingOptions;
   long long numPossibilitiesBruteForce = 1;
   long long numPossibilitiesCurrentBoard = 1;
   for (const auto& piece : _currUnplacedPieces) {
     numPossibilitiesBruteForce *= piece->getNumInitialPlaceableOptions();
-    auto remainingOptionsForPiece = Piece::determinePlaceableOptions(_fields, piece, _currUnplacedPieces);
+    auto remainingOptionsForPiece = Piece::determinePlaceableOptions(_fields, piece, true);
+    if (reduce) {
+      remainingOptionsForPiece = Piece::reducePlaceableOptions(remainingOptionsForPiece, _fields, piece, _currUnplacedPieces);
+    }
     remainingOptions[piece] = remainingOptionsForPiece;
     numPossibilitiesCurrentBoard *= remainingOptionsForPiece.size();
-    if (print) {
+    if (printLog) {
       cout << piece->id() << " had " << piece->getNumInitialPlaceableOptions() << " initial placement options, "
-           << remainingOptionsForPiece.size() << " remain with current board" << endl;
+           << remainingOptionsForPiece.size() << " remain with current board " << reduceInfo << endl;
     }
   }
-  if (print) {
-    cout << "Brute-force: " << numPossibilitiesBruteForce << ", Current board: " << numPossibilitiesCurrentBoard << endl;
+  if (printLog) {
+    cout << "Brute-force: " << numPossibilitiesBruteForce
+         << ", Current board " << reduceInfo << ": " << numPossibilitiesCurrentBoard << endl;
   }
   _remainingBruteForceOptions = numPossibilitiesCurrentBoard;
   return remainingOptions;
+}
+
+std::string magicValue(const BoardState &boardState, const std::vector<Piece *> &unplacedPieces)
+{
+  stringstream ss;
+  ss << boardState.size();
+  if (boardState.empty())
+    return ss.str();
+
+  ss << "_" << boardState.size();
+  ss << "__" << unplacedPieces.size();
+  for (const auto& p : unplacedPieces) {
+    ss << "_" << p->id() << "_" << p->getNumOrientations() << "_" << p->getExtent();
+  }
+  return ss.str();
+}
+
+bool Board::writeReducedInitOptionsToCache(const BoardState &boardState, const std::vector<Piece *> &unplacedPieces)
+{
+  ofstream file;
+  file.open(INIT_OPTIONS_CACHE_FILE, ios::out | ios::trunc);
+  if (!file.is_open()) {
+    cerr << "Error: cannot write to cache file: " << INIT_OPTIONS_CACHE_FILE << endl;
+    return false;
+  }
+
+  // header
+  file << magicValue(boardState, unplacedPieces) << endl;
+
+  // data
+  file << unplacedPieces.size() << endl;
+  for (const auto& p : unplacedPieces) {
+    file << p->id() << endl;
+    file << p->getNumInitialPlaceableOptions() << endl;
+    for (const auto& option : p->getInitialPlaceableOptions())
+      file << option._orientationIdx << " " << option._topLeftOnBoard.x << " " << option._topLeftOnBoard.y << endl;
+  }
+
+
+  cout << "Wrote cache file: " << INIT_OPTIONS_CACHE_FILE << endl;
+  return true;
+}
+
+bool Board::readReducedInitOptionsFromCache(const BoardState &boardState, const std::vector<Piece *> &unplacedPieces)
+{
+  ifstream file;
+  file.open(INIT_OPTIONS_CACHE_FILE);
+  if (!file.is_open()) {
+    cout << "cannot read from cache: " << INIT_OPTIONS_CACHE_FILE << endl;
+    return false;
+  }
+
+  // read header
+  auto magicValueCurr = magicValue(boardState, unplacedPieces);
+
+  std::string magicValueFromCache;
+  getline(file, magicValueFromCache);
+  if (magicValueFromCache != magicValueCurr) {
+    cout << "cannot use cache file because board/piece configuration seems different" << endl;
+    cout << "magic values differ: '" << magicValueFromCache << "' vs. '" << magicValueCurr << "'" << endl;
+    return false;
+  }
+
+  // read data
+  std::string line;
+
+  size_t numUnplaced;
+  getline(file, line);
+  istringstream in(line);
+  in >> numUnplaced;
+  assert(numUnplaced == unplacedPieces.size());
+
+  for (size_t i=0; i<numUnplaced; i++) {
+    std::vector<BoardPlacementEntry> cachedOptions;
+
+    auto piece = unplacedPieces[i];
+    getline(file, line);
+    assert(line.size()==1 && line[0] == piece->id());
+
+    size_t numPlacementsForPiece;
+    getline(file, line);
+    istringstream in(line);
+    in >> numPlacementsForPiece;
+
+    for (size_t placement=0; placement<numPlacementsForPiece; placement++) {
+      int orientationIndex;
+      Coord topLeftOnBoard;
+      getline(file, line);
+      istringstream in(line);
+      in >> orientationIndex >> topLeftOnBoard.x >> topLeftOnBoard.y;
+      cachedOptions.emplace_back(orientationIndex, topLeftOnBoard);
+    }
+    piece->setInitialPlaceableOptions(cachedOptions);
+  }
+
+  cout << "Read and applied cache file: " << INIT_OPTIONS_CACHE_FILE << endl;
+  return true;
 }

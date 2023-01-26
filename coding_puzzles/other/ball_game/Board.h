@@ -28,7 +28,12 @@ public:
 
 private:
   bool solveRecursive(std::map<Piece*, std::vector<BoardPlacementEntry>> &remainingPossibilities);
-  std::map<Piece*, std::vector<BoardPlacementEntry>>  getRemainingPlacementOptions(bool print=false) const;
+  std::map<Piece*, std::vector<BoardPlacementEntry>>  getRemainingPlacementOptions(bool reduce, bool printLog) const;
+
+  // file cache for speedup
+  static const std::string INIT_OPTIONS_CACHE_FILE;
+  bool writeReducedInitOptionsToCache(const BoardState &boardState, const std::vector<Piece *> &unplacedPieces);
+  bool readReducedInitOptionsFromCache(const BoardState &boardState, const std::vector<Piece *> &unplacedPieces);
 
 private:
   int _numFreeFields{-1};
