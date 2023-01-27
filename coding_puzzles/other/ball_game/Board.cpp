@@ -297,6 +297,13 @@ bool Board::solveGame()
   auto remainingPossibilities = getRemainingPlacementOptions(true, true);
   _numRecursiveCalls = 0;
 
+  for (const auto& [piece, options] : remainingPossibilities) {
+    if (options.empty()) {
+      cerr << "Error -> Board is not solvable" << endl;
+      return false;
+    }
+  }
+
   // restore original state if solving was not successful
   auto startTime = std::chrono::steady_clock::now();
   Board backup(*this);

@@ -14,13 +14,13 @@ public:
     }
 };
 
-//TEST(CLASSNAME, TestInteractive)
-//{
-//    Game g;
-//    g.init();
-//    int ret = g.mainLoop();
-//    cout << "Program exited " << (ret==0 ? "normally" : "with failure") << " -> return code: " << ret << endl;
-//}
+TEST(CLASSNAME, TestInteractive)
+{
+    Game g;
+    g.init();
+    int ret = g.mainLoop();
+    cout << "Program exited " << (ret==0 ? "normally" : "with failure") << " -> return code: " << ret << endl;
+}
 
 TEST(CLASSNAME, Test001)
 {
@@ -159,5 +159,20 @@ TEST(CLASSNAME, Test056)
     cout << "Program exited " << (ret==0 ? "normally" : "with failure") << " -> return code: " << ret << endl;
     ASSERT_EQ(ret, 0);
 }
-
+TEST(CLASSNAME, TestImpossible001)
+{
+    Game g;
+    g.init();
+    int ret = g.mainLoop("/home/gert/private/workspace/coding_puzzles/coding_puzzles/other/ball_game/impossible_001_10left.txt");
+    cout << "Program exited " << (ret==0 ? "normally" : "with failure") << " -> return code: " << ret << endl;
+    ASSERT_EQ(ret, -1);
+}
+TEST(CLASSNAME, TestImpossible002)
+{
+    Game g;
+    g.init();
+    int ret = g.mainLoop("/home/gert/private/workspace/coding_puzzles/coding_puzzles/other/ball_game/impossible_002_2left.txt");
+    cout << "Program exited " << (ret==0 ? "normally" : "with failure") << " -> return code: " << ret << endl;
+    ASSERT_EQ(ret, -1);
+}
 #undef CLASSNAME
