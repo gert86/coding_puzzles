@@ -2,17 +2,29 @@
 #include "Board.h"
 #include "Piece.h"
 
+#include <fstream>
+
 void Game::init()
 {
   _board = new Board();
 }
 
-int Game::mainLoop()
+int Game::mainLoop(string localFile)
 {
+  istream *in;
+  ifstream ifn;
+  if (localFile.empty()) {
+    in = &cin;
+  }
+  else {
+    ifn.open(localFile);
+    in = &ifn;
+  }
+
   showPrompt();
   std::string input;
   while (true) {
-    getline(cin, input);
+    getline(*in, input);
 
     if (input.empty()) {
       // "scrolling"
@@ -126,6 +138,9 @@ int Game::mainLoop()
     }
     else if (input == "q") {
       cout << "Quit!" << endl;
+      if (_board->getUnplacedPieces().size() > 0)
+        return -1;
+
       return 0;
     }
     else {
@@ -134,7 +149,7 @@ int Game::mainLoop()
     cout << endl;
   }
 
-  return -1;
+  return -10;  // unknown failure
 }
 
 void Game::showPrompt() const

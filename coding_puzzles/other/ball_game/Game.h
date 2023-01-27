@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "Types.h"
+#include <iostream>
 
 class Board;
 
@@ -9,7 +10,7 @@ class Game
 {
 public:
   void init();
-  int mainLoop();
+  int mainLoop(string localFile = "");
 
 private:
   void showPrompt() const;
