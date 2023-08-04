@@ -15,9 +15,6 @@ find_package(Qt5Core)
 # Locate GTest
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
-#set(GTEST_INCLUDE_DIRS "/home/gert/.conan/data/gtest/1.11.0/_/_/package/8887312d8d5d906d59a60762be586000713d5f48/include/gtest")
-#set(GTEST_LIBRARIES "/home/gert/.conan/data/gtest/1.11.0/_/_/package/8887312d8d5d906d59a60762be586000713d5f48/lib/libgtestd.a")
-
 # all sources
 message("CMAKE_SOURCE_DIR is: ${CMAKE_SOURCE_DIR}")
 FILE(GLOB TARGET_H "${CMAKE_SOURCE_DIR}/*.h")
